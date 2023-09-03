@@ -20,9 +20,3 @@ spring:
       database: 12
   application:
     name: van-template-api
-
-
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-  mapper-locations: classpath*:mapper/**/*.xml
