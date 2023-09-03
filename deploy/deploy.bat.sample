@@ -1,0 +1,4 @@
+echo "the jar is deploying..."
+scp .\target\van-template-api.jar root@服务器地址:/data/van-template-api/
+echo "restart application now."
+ssh root@服务器地址 "/data/van-template-api/restart.sh"

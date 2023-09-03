@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/cloud-center?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&nullCatalogMeansCurrent=true"
+    username: debian-sys-maint
+    password: 7tLwBd459gvpA16J
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          max-wait: -1
+          min-idle: 0
+      database: 12
+  application:
+    name: van-template-api
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:mapper/**/*.xml
