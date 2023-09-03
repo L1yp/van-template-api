@@ -176,7 +176,7 @@
                             <target>
                                 <exec
                                         dir="${project.basedir}"
-                                        executable="${project.basedir}/deploy.bat"
+                                        executable="${project.basedir}/deploy/deploy.bat"
                                         failonerror="true">
                                 </exec>
                             </target>
