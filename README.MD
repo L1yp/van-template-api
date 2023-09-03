@@ -4,3 +4,4 @@
 4. 复制 `deploy.bat.sample`, 重命名为 `deploy.bat`
 5. 修改 `application-local.yml` 的 `spring.application.name` 为当前项目名称
 6. 修改 `application-prod.yml` 的 `spring.application.name` 为当前项目名称
+7. VMOptions添加: `--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED`
