@@ -128,7 +128,8 @@ public class UserController {
     @PostMapping("/login")
     public ResultData<UserLoginResultDTO> login(@Validated @RequestBody UserLoginDTO param) {
         param.setLoginIp(getRequestIp());
-        return ResultData.ok(service.login(param));
+        UserLoginResultDTO resultDTO = service.login(param);
+        return ResultData.ok(resultDTO);
     }
 
     @SaCheckPermission("user.password.change")
