@@ -17,6 +17,10 @@ public class SpringContext implements ApplicationListener<ApplicationStartedEven
     }
 
     public static <T> T getBean(Class<T> clazz) {
+        String[] beanNamesForType = ctx.getBeanNamesForType(clazz);
+        if (beanNamesForType.length == 0) {
+            return null;
+        }
         return ctx.getBean(clazz);
     }
 

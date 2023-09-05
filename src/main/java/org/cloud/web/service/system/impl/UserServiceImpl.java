@@ -45,6 +45,7 @@ import org.cloud.web.service.system.IMenuService;
 import org.cloud.web.service.system.IRoleMenuService;
 import org.cloud.web.service.system.IRolePermService;
 import org.cloud.web.service.system.IUserDepartmentService;
+import org.cloud.web.service.system.IUserExtService;
 import org.cloud.web.service.system.IUserLoginLogService;
 import org.cloud.web.service.system.IUserRoleService;
 import org.cloud.web.service.system.IUserService;
@@ -271,6 +272,12 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         result.setMenuList(userService.getMenuList(userId));
         result.setRoleIdList(userService.getRoleIdList(userId));
         result.setPermKeyList(userService.getPermKeyList(userId));
+
+        IUserExtService userExtService = SpringContext.getBean(IUserExtService.class);
+        if (userExtService != null) {
+            userExtService.setUserExtension(result);
+        }
+
         return result;
 
 
