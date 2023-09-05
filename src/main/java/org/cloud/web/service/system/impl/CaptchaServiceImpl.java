@@ -28,6 +28,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
     @Value("${captcha.height:100}")
     int height;
 
+    @Value("${captcha.enable:false}")
+    boolean enable;
+
 
     @CacheTTL(120L)
     @CachePut(key = "#token", unless = "#result == null")
@@ -38,8 +41,7 @@ public class CaptchaServiceImpl implements ICaptchaService {
     }
 
     public boolean verifyCaptchaCode(String token, String input) {
-        // FIXME 正式机去掉
-        if (input.equals("1111")) {
+        if (!enable) {
             return true;
         }
         ICaptchaService captchaService  = (ICaptchaService) AopContext.currentProxy();

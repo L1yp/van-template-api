@@ -9,13 +9,17 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.cloud.cache.CacheTTL;
+import org.cloud.config.TFAConfig;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.Converter;
 import org.cloud.model.common.PageData;
 import org.cloud.model.enums.CommonStatus;
 import org.cloud.model.enums.LoginType;
 import org.cloud.model.enums.UserDeptType;
+import org.cloud.model.enums.UserLoginResultStatus;
+import org.cloud.model.enums.UserTwoFAType;
 import org.cloud.service.AbstractService;
+import org.cloud.util.AuthenticatorUtils;
 import org.cloud.util.DigestUtil;
 import org.cloud.util.MessageUtils;
 import org.cloud.util.PinyinUtil;
@@ -24,6 +28,7 @@ import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
 import org.cloud.web.model.DO.system.UserRoleDO;
+import org.cloud.web.model.DO.system.UserTwoFAKeyDO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
 import org.cloud.web.model.DTO.in.system.UserDeptBindDTO;
@@ -34,6 +39,7 @@ import org.cloud.web.model.DTO.in.system.UserRoleBindDTO;
 import org.cloud.web.model.DTO.in.system.UserUpdateDTO;
 import org.cloud.web.model.DTO.out.system.MenuOutputDTO;
 import org.cloud.web.model.DTO.out.system.UserLoginResultDTO;
+import org.cloud.web.model.DTO.out.system.UserLoginResultDTO.AuthBindInfo;
 import org.cloud.web.model.DTO.out.system.UserOutputDTO;
 import org.cloud.web.service.system.ICaptchaService;
 import org.cloud.web.service.system.IMenuService;
@@ -90,6 +96,9 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     @Resource
     IRoleMenuService roleMenuService;
+
+    @Resource
+    UserTwoFAKeyServiceImpl userTwoFAKeyService;
 
     @Override
     public IUserService getProxy() {
@@ -155,14 +164,16 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Resource
     IUserLoginLogService userLoginLogService;
 
+    @Resource
+    TFAConfig tfaConfig;
+
     @Transactional
     public UserLoginResultDTO login(UserLoginDTO param) {
-        if (!"1111".equals(param.getCaptchaCode()) && !captchaService.verifyCaptchaCode(param.getCaptchaToken(), param.getCaptchaCode())) {
+        if (!captchaService.verifyCaptchaCode(param.getCaptchaToken(), param.getCaptchaCode())) {
             throw new BusinessException(400, MessageUtils.getMessage("captcha.verify.error"));
         }
 
         UserDO user = getProxy().getByUserName(param.getUsername());
-
         if (user == null) {
             throw new BusinessException(404, MessageUtils.getMessage("user.not-found", param.getUsername()));
         }
@@ -174,6 +185,61 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         if (!saltHashPass.equals(user.getPassword())) {
             throw new BusinessException(400, MessageUtils.getMessage("password.verify.error"));
         }
+
+
+        if (tfaConfig.isEnable()) {
+            UserTwoFAKeyDO userTwoFAKeyModel = userTwoFAKeyService.getByUserIdAndType(user.getId(), tfaConfig.getType());
+            String secretKey = AuthenticatorUtils.generateSecretKey();
+
+            if (userTwoFAKeyModel == null) {
+                // 需要绑定
+                var addDTO = new UserTwoFAKeyDO();
+                addDTO.setUserId(user.getId());
+                addDTO.setType(tfaConfig.getType());
+                addDTO.setSecretKey(secretKey);
+                addDTO.setBound(false);
+                userTwoFAKeyService.add(addDTO);
+
+
+            }
+            else if (!userTwoFAKeyModel.getBound()) {
+                var updateDO = new UserTwoFAKeyDO();
+                updateDO.setId(userTwoFAKeyModel.getId());
+                updateDO.setSecretKey(secretKey);
+                userTwoFAKeyService.updateByPrimaryKeySelective(updateDO);
+            }
+
+            // 未绑定 直接返回绑定二维码
+            if (userTwoFAKeyModel == null || !userTwoFAKeyModel.getBound()) {
+                String otpAuthURL = AuthenticatorUtils.generateOTPAuthURL(secretKey, user.getUsername(), tfaConfig.getIssuer());
+                var result = new UserLoginResultDTO();
+                result.setStatus(UserLoginResultStatus.AUTHENTICATOR_UNBOUND.getValue());
+                result.setBindInfo(new AuthBindInfo(otpAuthURL));
+                return result;
+            }
+
+            if (StringUtils.isBlank(param.getTwoFACode())) {
+                // 需要填写验证码
+                var result = new UserLoginResultDTO();
+                result.setStatus(UserLoginResultStatus.MISS_TFA_CODE.getValue());
+                return result;
+            }
+
+            boolean verifyFlag = AuthenticatorUtils.verifyCode(userTwoFAKeyModel.getSecretKey(), param.getTwoFACode());
+            if (!verifyFlag) {
+                throw new BusinessException(400, MessageUtils.getMessage("authenticator.verify.error"));
+            }
+
+            // 若未绑定则更新绑定状态
+            if (!userTwoFAKeyModel.getBound()) {
+                var updateDO = new UserTwoFAKeyDO();
+                updateDO.setId(userTwoFAKeyModel.getId());
+                updateDO.setBound(true);
+                userTwoFAKeyService.updateByPrimaryKeySelective(updateDO);
+            }
+
+        }
+
 
 
         StpUtil.login(user.getId());
@@ -195,6 +261,8 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     public UserLoginResultDTO getLoginResult(String userId) {
         var result = new UserLoginResultDTO();
+        result.setStatus(UserLoginResultStatus.SUCCESS.getValue());
+
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
         result.setToken(tokenInfo.getTokenValue());
 

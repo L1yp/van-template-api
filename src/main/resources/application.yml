@@ -57,6 +57,15 @@ captcha:
   candidate: "abcdefghjkmnpqrstuvwxyz23456789"
   width: 200
   height: 100
+  # 是否启用验证码功能
+  enable: true
 
 app:
   schedule: enable
+
+auth:
+  two-fa:
+    type: Authenticator
+    issuer: "Van"
+    enable: true
+

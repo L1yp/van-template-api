@@ -23,13 +23,14 @@ public class UserLoginDTO {
     @Schema(description = "密码MD5")
     private String password;
 
-    @NotBlank
     @Schema(description = "验证码Token")
     private String captchaToken;
 
-    @NotBlank
     @Schema(description = "图形验证码")
     private String captchaCode;
+
+    @Schema(description = "Google Auth 验证码")
+    private String twoFACode;
 
     @JsonIgnore
     @Schema(hidden = true)

@@ -39,6 +39,11 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
     }
 
 
+    @SuppressWarnings("unchecked")
+    private AbstractService<DO, DTO, QueryDTO> getProxy() {
+        return (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
+    }
+
     /**
      * 分页查询前的参数设置方法
      * @param wrapper 查询容器
@@ -179,6 +184,13 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
     @Transactional
     public void update(AbstractUpdateDTO<DO> param) {
         update(param, EMPTY);
+    }
+
+    @Transactional
+    public void updateByPrimaryKeySelective(DO model) {
+        DO modelDO = assertIdPresentAndGetDO(model.getId());
+        baseMapper.updateByPrimaryKeySelective(model);
+        getProxy().afterUpdate(model, modelDO);
     }
 
     protected void afterUpdate(DO paramDO, DO modelDO) {
