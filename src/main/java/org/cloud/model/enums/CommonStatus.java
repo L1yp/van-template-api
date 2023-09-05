@@ -1,9 +1,9 @@
 package org.cloud.model.enums;
 
-import org.cloud.model.enums.base.TagAttribute;
-import org.cloud.model.enums.base.TagAttribute.TagType;
 import org.cloud.model.enums.base.BasicEnum;
 import org.cloud.model.enums.base.ElTagEnum;
+import org.cloud.model.enums.base.TagAttribute;
+import org.cloud.model.enums.base.TagAttribute.TagType;
 
 /**
  * 通用状态枚举

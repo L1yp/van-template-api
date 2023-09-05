@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.cloud.model.Converter;
+import org.cloud.model.enums.CommonStatus;
 import org.cloud.model.enums.MenuType;
 import org.cloud.model.enums.base.BasicEnumValid;
-import org.cloud.model.enums.CommonStatus;
 import org.cloud.web.model.DO.system.MenuDO;
 import org.cloud.web.model.DO.system.MenuDO.MenuMeta;
 

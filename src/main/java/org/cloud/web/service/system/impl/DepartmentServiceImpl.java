@@ -8,7 +8,6 @@ import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
 import org.cloud.util.MessageUtils;
 import org.cloud.web.model.DO.system.DepartmentDO;
-import org.cloud.web.model.DO.system.RoleDO;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DTO.out.system.DepartmentOutputDTO;
 import org.cloud.web.service.system.IDepartmentService;

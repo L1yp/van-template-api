@@ -1,11 +1,9 @@
 package org.cloud.web.model.DTO.out.system;
 
-import io.mybatis.provider.Entity.Column;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.ibatis.type.JdbcType;
 import org.cloud.model.AbstractOutputDTO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 

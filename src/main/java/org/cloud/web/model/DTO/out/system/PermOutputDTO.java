@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.cloud.model.AbstractOutputDTO;
-import org.cloud.model.AbstractWithUpdateOutputDTO;
 import org.cloud.web.model.DO.system.PermDO;
 
 @Getter

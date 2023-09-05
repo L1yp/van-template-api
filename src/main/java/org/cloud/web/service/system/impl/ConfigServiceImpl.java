@@ -1,6 +1,5 @@
 package org.cloud.web.service.system.impl;
 
-import org.checkerframework.checker.units.qual.A;
 import org.cloud.model.enums.base.BasicEnum;
 import org.cloud.model.enums.base.ElTagEnum;
 import org.cloud.web.model.DTO.out.system.ConfigEnumOutputDTO;
@@ -11,8 +10,6 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

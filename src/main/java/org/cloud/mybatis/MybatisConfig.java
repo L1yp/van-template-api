@@ -7,10 +7,8 @@ import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.cloud.model.enums.base.BasicEnum;
 import org.cloud.mybatis.typehandler.BasicEnumTypeHandler;
 import org.cloud.mybatis.typehandler.JacksonTypeHandler;
-import org.cloud.web.model.DTO.out.system.ConfigEnumOutputDTO;
 import org.cloud.web.service.system.IConfigService;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.context.ApplicationListener;
@@ -22,7 +20,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j

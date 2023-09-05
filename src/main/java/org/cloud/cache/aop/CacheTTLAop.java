@@ -10,7 +10,6 @@ import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 @Component

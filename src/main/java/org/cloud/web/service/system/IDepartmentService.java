@@ -2,7 +2,6 @@ package org.cloud.web.service.system;
 
 import org.cloud.model.AbstractUpdateDTO;
 import org.cloud.model.Converter;
-import org.cloud.model.common.PageDTO;
 import org.cloud.web.model.DO.system.DepartmentDO;
 import org.cloud.web.model.DTO.out.system.DepartmentOutputDTO;
 

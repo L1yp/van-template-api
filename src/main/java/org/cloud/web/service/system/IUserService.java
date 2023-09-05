@@ -1,8 +1,6 @@
 package org.cloud.web.service.system;
 
 import io.mybatis.mapper.BaseMapper;
-import org.cloud.model.AbstractUpdateDTO;
-import org.cloud.model.Converter;
 import org.cloud.model.common.PageData;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;

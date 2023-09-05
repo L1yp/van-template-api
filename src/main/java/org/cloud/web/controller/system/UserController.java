@@ -25,7 +25,6 @@ import org.cloud.web.model.DTO.in.system.UserUpdateDTO;
 import org.cloud.web.model.DTO.out.system.UserLoginResultDTO;
 import org.cloud.web.model.DTO.out.system.UserOutputDTO;
 import org.cloud.web.service.system.IUserService;
-import org.cloud.web.service.system.impl.UserServiceImpl;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;

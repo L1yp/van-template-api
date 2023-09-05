@@ -1,9 +1,7 @@
 package org.cloud.web.service.system.impl;
 
 import jakarta.annotation.Resource;
-import org.cloud.config.TFAConfig;
 import org.cloud.model.common.PageDTO;
-import org.cloud.model.enums.UserThirdAuthType;
 import org.cloud.model.enums.UserTwoFAType;
 import org.cloud.service.AbstractService;
 import org.cloud.web.mapper.system.UserTwoFAKeyMapper;

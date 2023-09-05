@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
-import org.springframework.lang.Nullable;
 
 import java.util.concurrent.Callable;
 

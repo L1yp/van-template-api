@@ -1,6 +1,5 @@
 package org.cloud.web.model.DTO.out.system;
 
-import io.mybatis.provider.Entity.Column;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import org.cloud.model.AbstractOutputDTO;
 import org.cloud.model.enums.CommonStatus;
 import org.cloud.model.enums.UserThirdAuthType;
 import org.cloud.model.enums.base.BasicEnumValid;
-import org.cloud.mybatis.typehandler.BasicEnumTypeHandler;
 import org.cloud.web.model.DO.system.UserThirdAuthDO;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,6 @@
 package org.cloud.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.cloud.util.BeanCopierUtil;
 
 import java.lang.reflect.ParameterizedType;

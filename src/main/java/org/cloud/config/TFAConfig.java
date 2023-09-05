@@ -1,7 +1,6 @@
 package org.cloud.config;
 
 import lombok.Data;
-import org.cloud.model.enums.UserThirdAuthType;
 import org.cloud.model.enums.UserTwoFAType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

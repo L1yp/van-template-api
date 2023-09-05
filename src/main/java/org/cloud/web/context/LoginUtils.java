@@ -1,7 +1,6 @@
 package org.cloud.web.context;
 
 import cn.dev33.satoken.stp.StpUtil;
-import org.cloud.web.model.DO.system.UserDO;
 import org.springframework.web.context.request.RequestContextHolder;
 
 public class LoginUtils {
