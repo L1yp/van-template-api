@@ -17,7 +17,6 @@ import org.cloud.model.enums.CommonStatus;
 import org.cloud.model.enums.LoginType;
 import org.cloud.model.enums.UserDeptType;
 import org.cloud.model.enums.UserLoginResultStatus;
-import org.cloud.model.enums.UserTwoFAType;
 import org.cloud.service.AbstractService;
 import org.cloud.util.AuthenticatorUtils;
 import org.cloud.util.DigestUtil;
@@ -70,7 +69,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -244,8 +242,10 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
         StpUtil.login(user.getId());
 
-        // 删除验证码缓存
-        captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
+        if (StringUtils.isNotBlank(param.getCaptchaToken())) {
+            // 删除验证码缓存
+            captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
+        }
 
         var userLoginLog = new UserLoginLogDO();
         userLoginLog.setLoginIp(param.getLoginIp());
