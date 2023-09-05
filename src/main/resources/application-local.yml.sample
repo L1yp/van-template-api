@@ -20,3 +20,13 @@ spring:
       database: 12
   application:
     name: van-template-api
+
+
+
+captcha:
+  # 是否启用验证码功能
+  enable: false
+
+auth:
+  two-fa:
+    enable: false
