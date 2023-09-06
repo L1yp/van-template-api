@@ -72,9 +72,9 @@ public interface IUserService {
      * 新增用户
      * @param model 用户数据
      */
-    void add(UserAddDTO model);
+    void insert(UserAddDTO model);
 
-    void add(UserDO model);
+    void insert(UserDO model);
 
     /**
      * 用户注册

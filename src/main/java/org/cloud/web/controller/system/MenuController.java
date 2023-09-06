@@ -44,7 +44,7 @@ public class MenuController {
         if (StringUtils.isBlank(param.getPid())) {
             param.setPid(null);
         }
-        menuService.add(param);
+        menuService.insertSelective(param);
         return ResultData.OK;
     }
 
@@ -68,7 +68,7 @@ public class MenuController {
     @Operation(summary = "更新菜单")
     @SaCheckPermission("menu.update")
     public ResultData<Void> update(@RequestBody @Validated MenuUpdateDTO param) {
-        menuService.update(param);
+        menuService.updateByPrimaryKeySelective(param);
         return ResultData.OK;
     }
 

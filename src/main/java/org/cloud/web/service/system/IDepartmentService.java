@@ -18,13 +18,13 @@ public interface IDepartmentService {
      * 新增部门
      * @param param 部门信息
      */
-    void add(Converter<DepartmentDO> param);
+    void insert(Converter<DepartmentDO> param);
 
     /**
      * 更新部门
      * @param param 部门信息
      */
-    void update(AbstractUpdateDTO<DepartmentDO> param);
+    void updateByPrimaryKeySelective(AbstractUpdateDTO<DepartmentDO> param);
 
     /**
      * 根据ID删除部门

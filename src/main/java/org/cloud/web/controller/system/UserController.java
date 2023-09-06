@@ -153,7 +153,7 @@ public class UserController {
         } else if (param.getRoleIdList().contains(defaultRole)) {
             param.getRoleIdList().add(defaultRole);
         }
-        service.add(param);
+        service.insert(param);
         return ResultData.OK;
     }
 

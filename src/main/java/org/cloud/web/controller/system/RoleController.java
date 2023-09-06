@@ -41,7 +41,7 @@ public class RoleController {
     @PostMapping("/add")
     @Operation(summary = "新增角色")
     public ResultData<Void> add(@RequestBody @Validated RoleAddDTO param) {
-        roleService.add(param);
+        roleService.insertSelective(param);
         return ResultData.OK;
     }
 
@@ -64,7 +64,7 @@ public class RoleController {
     @Operation(summary = "更新角色")
     @SaCheckPermission("role.update")
     public ResultData<Void> update(@RequestBody @Validated RoleUpdateDTO param) {
-        roleService.update(param);
+        roleService.updateByPrimaryKeySelective(param);
         return ResultData.OK;
     }
 

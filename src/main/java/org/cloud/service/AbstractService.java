@@ -103,27 +103,47 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
 
     @Transactional
     @SuppressWarnings("unchecked")
-    public void add(Converter<DO> param, Consumer<DO> consumer) {
+    public void insert(Converter<DO> param, Consumer<DO> consumer) {
         DO modelDO = prepare(param, consumer);
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
-        service.prepareAdd(modelDO);
+        getProxy().prepareAdd(modelDO);
         baseMapper.insert(modelDO);
-        service.afterAdd(modelDO);
+        getProxy().afterAdd(modelDO);
     }
 
     @Transactional
     @SuppressWarnings("unchecked")
-    public void add(Converter<DO> param) {
-        add(param, null);
+    public void insertSelective(Converter<DO> param, Consumer<DO> consumer) {
+        DO modelDO = prepare(param, consumer);
+        getProxy().prepareAdd(modelDO);
+        baseMapper.insertSelective(modelDO);
+        getProxy().afterAdd(modelDO);
+    }
+
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public void insertSelective(Converter<DO> param) {
+        getProxy().insertSelective(param, null);
+    }
+
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public void insert(Converter<DO> param) {
+        insert(param, null);
     }
 
 
     @SuppressWarnings("unchecked")
-    public void add(DO modelDO) {
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
-        service.prepareAdd(modelDO);
+    public void insert(DO modelDO) {
+        getProxy().prepareAdd(modelDO);
         baseMapper.insert(modelDO);
-        service.afterAdd(modelDO);
+        getProxy().afterAdd(modelDO);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void insertSelective(DO modelDO) {
+        getProxy().prepareAdd(modelDO);
+        baseMapper.insertSelective(modelDO);
+        getProxy().afterAdd(modelDO);
     }
 
     protected void afterAdd(DO model) { }
@@ -143,8 +163,7 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
      */
     @SuppressWarnings("unchecked")
     public DO assertIdPresentAndGetDO(String id) {
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
-        DO model = service.getById(id);
+        DO model = getProxy().getById(id);
         if (model == null) {
             throw new BusinessException(404, MessageUtils.getMessage("id.not-found", id));
         }
@@ -157,33 +176,37 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
 
     @Transactional
     @SuppressWarnings("unchecked")
-    public void update(AbstractUpdateDTO<DO> param, Consumer<DO> consumer) {
+    public void updateByPrimaryKeySelective(AbstractUpdateDTO<DO> param, Consumer<DO> consumer) {
         DO paramDO = prepare(param, consumer);
         DO modelDO = assertIdPresentAndGetDO(param.getId());
 
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
-        service.prepareUpdate(paramDO, modelDO);
+        getProxy().prepareUpdate(paramDO, modelDO);
         baseMapper.updateByPrimaryKeySelective(paramDO);
-        service.afterUpdate(paramDO, modelDO);
+        getProxy().afterUpdate(paramDO, modelDO);
     }
 
     @Transactional
     @SuppressWarnings("unchecked")
-    public void update(AbstractUpdateDTO<DO> param, Fns<DO> fns) {
+    public void updateByPrimaryKeySelective(AbstractUpdateDTO<DO> param) {
+        getProxy().updateByPrimaryKeySelective(param, null);
+    }
+
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public void updateByPrimaryKeySelectiveWithForceFields(AbstractUpdateDTO<DO> param, Fns<DO> fns) {
         DO paramDO = prepare(param, null);
         DO modelDO = assertIdPresentAndGetDO(param.getId());
 
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
-        service.prepareUpdate(paramDO, modelDO);
+        getProxy().prepareUpdate(paramDO, modelDO);
         baseMapper.updateByPrimaryKeySelectiveWithForceFields(paramDO, fns);
-        service.afterUpdate(paramDO, modelDO);
+        getProxy().afterUpdate(paramDO, modelDO);
     }
 
     private final Consumer<DO> EMPTY = model -> {};
 
     @Transactional
-    public void update(AbstractUpdateDTO<DO> param) {
-        update(param, EMPTY);
+    public void updateByPrimaryKeySelectiveWithForceFields(AbstractUpdateDTO<DO> param) {
+        updateByPrimaryKeySelective(param, EMPTY);
     }
 
     @Transactional
@@ -208,11 +231,10 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
     @SuppressWarnings("unchecked")
     public void deleteById(String id) {
         DO dto = assertIdPresentAndGetDO(id);
-        AbstractService<DO, DTO, QueryDTO> service = (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
 
-        service.prepareDelete(dto);
+        getProxy().prepareDelete(dto);
         baseMapper.deleteByPrimaryKey(id);
-        service.afterDelete(dto);
+        getProxy().afterDelete(dto);
     }
 
     /**

@@ -45,7 +45,7 @@ public class PermController {
         if (StringUtils.isBlank(param.getPid())) {
             param.setPid(null);
         }
-        permService.add(param);
+        permService.insertSelective(param);
         return ResultData.OK;
     }
 
@@ -83,7 +83,7 @@ public class PermController {
     @Operation(summary = "更新权限")
     @SaCheckPermission("perm.update")
     public ResultData<Void> update(@RequestBody @Validated PermUpdateDTO param) {
-        permService.update(param);
+        permService.updateByPrimaryKeySelective(param);
         return ResultData.OK;
     }
 }

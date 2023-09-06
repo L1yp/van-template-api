@@ -18,14 +18,13 @@ public interface IMenuService {
 
     MenuDO getById(String id);
 
-    void update(AbstractUpdateDTO<MenuDO> param);
+    void updateByPrimaryKeySelective(AbstractUpdateDTO<MenuDO> param);
 
     void deleteById(String id);
 
-    void add(MenuDO modelDO);
+    void insertSelective(Converter<MenuDO> param);
 
-    void add(Converter<MenuDO> param);
+    void insert(Converter<MenuDO> param);
 
-    void add(Converter<MenuDO> param, Consumer<MenuDO> consumer);
 
 }

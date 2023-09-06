@@ -55,7 +55,7 @@ public interface IPermService {
      * 更新权限信息
      * @param param {@link org.cloud.web.model.DTO.in.system.PermUpdateDTO}
      */
-    void update(AbstractUpdateDTO<PermDO> param);
+    void updateByPrimaryKeySelective(AbstractUpdateDTO<PermDO> param);
 
     /**
      * 通过权限ID删除权限
@@ -67,20 +67,22 @@ public interface IPermService {
      * 新增权限
      * @param modelDO 权限信息
      */
-    void add(PermDO modelDO);
+    void insert(PermDO modelDO);
+
+    void insertSelective(PermDO modelDO);
 
     /**
      * 新增权限
      * @param param {@link org.cloud.web.model.DTO.in.system.PermAddDTO}
      */
-    void add(Converter<PermDO> param);
+    void insertSelective(Converter<PermDO> param);
 
     /**
      * 新增权限
      * @param param {@link org.cloud.web.model.DTO.in.system.PermAddDTO}
      * @param consumer DO预处理
      */
-    void add(Converter<PermDO> param, Consumer<PermDO> consumer);
+    void insertSelective(Converter<PermDO> param, Consumer<PermDO> consumer);
 
 
 }

@@ -39,6 +39,6 @@ public interface IUserDepartmentService {
      */
     void evictUserIdListByDepartmentId(String departmentId);
 
-    void add(UserDepartmentDO model);
+    void insert(UserDepartmentDO model);
 
 }

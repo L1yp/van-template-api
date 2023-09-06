@@ -197,7 +197,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                 addDTO.setType(tfaConfig.getType());
                 addDTO.setSecretKey(secretKey);
                 addDTO.setBound(false);
-                userTwoFAKeyService.add(addDTO);
+                userTwoFAKeyService.insert(addDTO);
 
 
             }
@@ -254,7 +254,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         userLoginLog.setUsername(param.getUsername());
         userLoginLog.setNickname(user.getNickname());
         userLoginLog.setLoginType(LoginType.PWD);
-        userLoginLogService.add(userLoginLog);
+        userLoginLogService.insert(userLoginLog);
 
 
         return getLoginResult(user.getId());
@@ -315,7 +315,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     @Override
     @Transactional
-    public void add(UserAddDTO param) {
+    public void insert(UserAddDTO param) {
         UserDO modelDO = prepare(param, null);
         UserServiceImpl service = (UserServiceImpl) AopContext.currentProxy();
         service.prepareAdd(modelDO);
@@ -326,7 +326,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             model.setDepartmentId(param.getDeptId());
             model.setUserId(modelDO.getId());
             model.setType(UserDeptType.PRIMARY);
-            userDepartmentService.add(model);
+            userDepartmentService.insert(model);
             // 清空部门 - 用户绑定关系
             userDepartmentService.evictUserIdListByDepartmentId(param.getDeptId());
         }
@@ -337,7 +337,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                 model.setDepartmentId(deptId);
                 model.setUserId(modelDO.getId());
                 model.setType(UserDeptType.SECONDARY);
-                userDepartmentService.add(model);
+                userDepartmentService.insert(model);
                 // 清空部门 - 用户绑定关系
                 userDepartmentService.evictUserIdListByDepartmentId(deptId);
             }
@@ -349,7 +349,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                 var model = new UserRoleDO();
                 model.setRoleId(roleId);
                 model.setUserId(modelDO.getId());
-                userRoleService.add(model);
+                userRoleService.insert(model);
                 // 清空 角色 - 用户 绑定关系
                 userRoleService.evictUserIdListByRoleId(roleId);
             }
@@ -379,7 +379,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         UserDO userDO = param.convert();
         userDO.setStatus(CommonStatus.ENABLE);
         IUserService userService = (IUserService) AopContext.currentProxy();
-        userService.add(userDO);
+        userService.insert(userDO);
 
         // 删除验证码缓存
         captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
@@ -446,7 +446,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             UserRoleDO userRoleDO = new UserRoleDO();
             userRoleDO.setUserId(param.getUserId());
             userRoleDO.setRoleId(roleId);
-            userRoleService.add(userRoleDO);
+            userRoleService.insert(userRoleDO);
         }
     }
 
@@ -464,7 +464,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             model.setUserId(param.getUserId());
             model.setDepartmentId(param.getDeptId());
             model.setType(UserDeptType.PRIMARY);
-            userDepartmentService.add(model);
+            userDepartmentService.insert(model);
         }
 
         for (String deptId : param.getDeptIdList()) {
@@ -472,7 +472,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             model.setUserId(param.getUserId());
             model.setDepartmentId(deptId);
             model.setType(UserDeptType.SECONDARY);
-            userDepartmentService.add(model);
+            userDepartmentService.insert(model);
         }
 
 
@@ -515,7 +515,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     public void update(UserUpdateDTO param) {
         UserServiceImpl service = (UserServiceImpl) AopContext.currentProxy();
         // 强制更新部门ID和头像
-        super.update(param, Fn.of(UserDO::getDeptId, UserDO::getAvatar));
+        super.updateByPrimaryKeySelectiveWithForceFields(param, Fn.of(UserDO::getDeptId, UserDO::getAvatar));
 
         var bindDeptParam = new UserDeptBindDTO();
         bindDeptParam.setUserId(param.getId());

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IUserRoleService {
 
-    void add(UserRoleDO modelDO);
+    void insert(UserRoleDO modelDO);
 
     BaseMapper<UserRoleDO, String> getBaseMapper();
 

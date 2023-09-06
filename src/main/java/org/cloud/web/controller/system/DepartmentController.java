@@ -37,7 +37,7 @@ public class DepartmentController {
     @Operation(summary = "新增部门")
     @PostMapping("/add")
     public ResultData<Void> add(@RequestBody @Validated DepartmentAddDTO param) {
-        departmentService.add(param);
+        departmentService.insert(param);
         return ResultData.OK;
     }
 
@@ -61,7 +61,7 @@ public class DepartmentController {
     @Operation(summary = "更新部门")
     @SaCheckPermission("dept.update")
     public ResultData<Void> update(@RequestBody @Validated DepartmentUpdateDTO param) {
-        departmentService.update(param);
+        departmentService.updateByPrimaryKeySelective(param);
         return ResultData.OK;
     }
 

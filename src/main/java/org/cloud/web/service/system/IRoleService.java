@@ -52,9 +52,9 @@ public interface IRoleService {
     List<PermOutputDTO> listPermByRoleId(String roleId);
 
 
-    void add(Converter<RoleDO> param);
+    void insertSelective(Converter<RoleDO> param);
 
-    void update(AbstractUpdateDTO<RoleDO> param);
+    void updateByPrimaryKeySelective(AbstractUpdateDTO<RoleDO> param);
 
 
 
