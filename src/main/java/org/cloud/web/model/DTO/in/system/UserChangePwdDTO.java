@@ -19,11 +19,12 @@ public class UserChangePwdDTO {
     @Schema(description = "新密码的MD5")
     private String newPassword;
 
-    @NotNull
     @Schema(description = "验证码Token")
     private String captchaToken;
 
-    @NotNull
     @Schema(description = "图形验证码")
     private String captchaCode;
+
+    @Schema(description = "动态随机密码")
+    private String authCode;
 }

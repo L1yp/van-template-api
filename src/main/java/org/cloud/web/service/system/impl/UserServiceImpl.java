@@ -293,6 +293,22 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             throw new BusinessException(400, MessageUtils.getMessage("user.not-found", param.getUsername()));
         }
 
+        if (tfaConfig.isEnable()) {
+            if (StringUtils.isBlank(param.getAuthCode())) {
+                throw new BusinessException(400, MessageUtils.getMessage("authenticator.code.blank"));
+            }
+
+            UserTwoFAKeyDO userTwoFAKeyDO = userTwoFAKeyService.getById(user.getId());
+            if (userTwoFAKeyDO == null) {
+                throw new BusinessException(400, MessageUtils.getMessage("authenticator.miss.secretKey"));
+            }
+
+            if (!AuthenticatorUtils.verifyCode(userTwoFAKeyDO.getSecretKey(), param.getAuthCode())) {
+                throw new BusinessException(400, MessageUtils.getMessage("authenticator.verify.error"));
+            }
+
+        }
+
         UserDO updateDO = new UserDO();
         updateDO.setId(user.getId());
 
@@ -303,8 +319,10 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         updateDO.setPassword(password);
         baseMapper.updateByPrimaryKeySelective(updateDO);
 
-        // 删除验证码缓存
-        captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
+        if (StringUtils.isNotBlank(param.getCaptchaToken())) {
+            // 删除验证码缓存
+            captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
+        }
 
         // 退出本帐号的所有登录会话
         StpUtil.logout(user.getId());
