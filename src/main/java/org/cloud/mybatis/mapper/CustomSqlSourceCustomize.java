@@ -81,7 +81,7 @@ public class CustomSqlSourceCustomize implements SqlSourceCustomize {
                         Optional<EntityColumn> entityColumn = columns.stream().filter(it -> it.column().equals(entityFieldName)).findFirst();
                         if (entityColumn.isPresent()) {
                             Class<? extends TypeHandler> typeHandlerClazz = entityColumn.get().typeHandler();
-                            if (typeHandlerClazz.equals(JacksonTypeHandler.class)) {
+                            if (JacksonTypeHandler.class.equals(typeHandlerClazz)) {
                                 Object additionalParameter = boundSql.getAdditionalParameter(property);
                                 String strValue = JSON.toJSONString(additionalParameter);
                                 boundSql.setAdditionalParameter(property, strValue);
