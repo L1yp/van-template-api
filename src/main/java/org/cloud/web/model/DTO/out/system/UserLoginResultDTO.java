@@ -47,7 +47,4 @@ public class UserLoginResultDTO {
         private String otpAuthURL;
     }
 
-    @Schema(description = "扩展信息")
-    private UserLoginResultExtDTO extension;
-
 }

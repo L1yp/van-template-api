@@ -275,7 +275,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
         IUserExtService userExtService = SpringContext.getBean(IUserExtService.class);
         if (userExtService != null) {
-            userExtService.setUserExtension(result);
+            result = userExtService.processLoginResult(result);
         }
 
         return result;
