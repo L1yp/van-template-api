@@ -20,18 +20,24 @@ import org.cloud.model.enums.UserLoginResultStatus;
 import org.cloud.service.AbstractService;
 import org.cloud.util.AuthenticatorUtils;
 import org.cloud.util.DigestUtil;
+import org.cloud.util.ImageCaptchaGenerator;
 import org.cloud.util.MessageUtils;
 import org.cloud.util.PinyinUtil;
 import org.cloud.util.SpringContext;
+import org.cloud.util.TokenUtil;
+import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
 import org.cloud.web.model.DO.system.UserRoleDO;
 import org.cloud.web.model.DO.system.UserTwoFAKeyDO;
+import org.cloud.web.model.DO.system.cache.MailVerifyCodeDO;
+import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
 import org.cloud.web.model.DTO.in.system.UserDeptBindDTO;
 import org.cloud.web.model.DTO.in.system.UserLoginDTO;
+import org.cloud.web.model.DTO.in.system.UserMailBindDTO;
 import org.cloud.web.model.DTO.in.system.UserQueryPageDTO;
 import org.cloud.web.model.DTO.in.system.UserRegisterDTO;
 import org.cloud.web.model.DTO.in.system.UserRoleBindDTO;
@@ -49,6 +55,7 @@ import org.cloud.web.service.system.IUserExtService;
 import org.cloud.web.service.system.IUserLoginLogService;
 import org.cloud.web.service.system.IUserRoleService;
 import org.cloud.web.service.system.IUserService;
+import org.cloud.web.service.system.MailService;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -99,9 +106,8 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Resource
     UserTwoFAKeyServiceImpl userTwoFAKeyService;
 
-    @Override
-    public IUserService getProxy() {
-        return SpringContext.getBean(IUserService.class);
+    public UserServiceImpl getProxy() {
+        return SpringContext.getBean(UserServiceImpl.class);
     }
 
     @Override
@@ -132,8 +138,10 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         if (userDO == null) {
             return null;
         }
-        IUserService userService = (IUserService) AopContext.currentProxy();
-        userService.putUserNameCache(userDO.getUsername(), userDO);
+        getProxy().putUserNameCache(userDO.getUsername(), userDO);
+        if (StringUtils.isNotBlank(userDO.getEmail())) {
+            getProxy().putUserEmailCache(userDO.getEmail(), userDO);
+        }
         return userDO;
     }
 
@@ -146,6 +154,22 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         }
         IUserService userService = (IUserService) AopContext.currentProxy();
         userService.putIdCache(userDO.getId(), userDO);
+        if (StringUtils.isNotBlank(userDO.getEmail())) {
+            getProxy().putUserEmailCache(userDO.getEmail(), userDO);
+        }
+        return userDO;
+    }
+
+    @Cacheable(key = "'email:' + #email")
+    public UserDO getByEmail(String email) {
+        UserDO userDO = baseMapper.wrapper().eq(UserDO::getEmail, email).first().orElse(null);
+        if (userDO == null) {
+            return null;
+        }
+        IUserService userService = (IUserService) AopContext.currentProxy();
+        userService.putIdCache(userDO.getId(), userDO);
+        getProxy().putUserNameCache(userDO.getUsername(), userDO);
+
         return userDO;
     }
 
@@ -156,6 +180,11 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     @CachePut(key = "'userName:' + #userName")
     public UserDO putUserNameCache(String userName, UserDO model) {
+        return model;
+    }
+
+    @CachePut(key = "'email:' + #email")
+    public UserDO putUserEmailCache(String email, UserDO model) {
         return model;
     }
 
@@ -331,6 +360,79 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         userService.afterUpdate(null, user);
     }
 
+    @Resource
+    MailService mailService;
+
+    @CacheTTL(60 * 60L)
+    @CachePut(cacheNames = "captcha", key = "#token")
+    public MailVerifyCodeDO cacheMailCodeModel(String token, MailVerifyCodeDO cacheModel) {
+        return cacheModel;
+    }
+
+
+    @CacheTTL(60 * 60L)
+    @CachePut(cacheNames = "captcha", key = "#result", unless = "#result == null")
+    public String getMailVerifyCode(MailVerifyCodeGetDTO param) {
+        UserDO user = getProxy().getById(param.getLoginUserId());
+        if (user == null) {
+            throw new BusinessException(400, MessageUtils.getMessage("user.no-login"));
+        }
+
+        String mailCode = ImageCaptchaGenerator.generateCaptchaText("1234567890", 6);
+
+        String token = TokenUtil.genToken();
+
+        MailVerifyCodeDO cacheModel = new MailVerifyCodeDO();
+        cacheModel.setOwnerUserId(user.getId());
+        cacheModel.setMail(param.getMail());
+        cacheModel.setVerifyCode(mailCode);
+
+        getProxy().cacheMailCodeModel(token, cacheModel);
+
+
+        mailService.sendVerifyCode(tfaConfig.getIssuer() + "邮箱绑定验证", param.getMail(), mailCode);
+        return token;
+    }
+
+
+    @CacheTTL(60 * 60L)
+    @CacheEvict(cacheNames = "captcha", key = "#param.mailToken")
+    public void bindMail(UserMailBindDTO param) {
+        UserDO user = getProxy().getById(param.getLoginUserId());
+        if (user == null) {
+            throw new BusinessException(400, MessageUtils.getMessage("user.no-login"));
+        }
+
+        MailVerifyCodeDO cacheModel = getProxy().getMailVerifyCodeInCache(param.getMailToken());
+
+        if (!user.getId().equals(cacheModel.getOwnerUserId())) {
+            throw new BusinessException(500, MessageUtils.getMessage("mail.bind.user.mismatch"));
+        }
+
+        if (!param.getCode().equals(cacheModel.getVerifyCode())) {
+            throw new BusinessException(400, MessageUtils.getMessage("mail.verify.error"));
+        }
+
+        baseMapper.wrapper()
+                .set(UserDO::getEmail, cacheModel.getMail())
+                .set(UserDO::getUpdateTime, LocalDateTime.now())
+                .eq(UserDO::getId, cacheModel.getOwnerUserId())
+                .update();
+
+        user = getProxy().getById(param.getLoginUserId());
+
+        getProxy().afterUpdate(user, user);
+
+    }
+
+    @CacheTTL(60 * 60L)
+    @Cacheable(cacheNames = "captcha", key = "#token", unless = "#result == null")
+    public MailVerifyCodeDO getMailVerifyCodeInCache(String token) {
+        return null;
+    }
+
+
+
     @Override
     @Transactional
     public void insert(UserAddDTO param) {
@@ -380,6 +482,9 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     protected void afterAdd(UserDO model) {
         getProxy().putIdCache(model.getId(), model);
         getProxy().putUserNameCache(model.getUsername(), model);
+        if (StringUtils.isNotBlank(model.getEmail())) {
+            getProxy().putUserEmailCache(model.getEmail(), model);
+        }
     }
 
     @Transactional
@@ -399,8 +504,15 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         IUserService userService = (IUserService) AopContext.currentProxy();
         userService.insert(userDO);
 
+        if (StringUtils.isNotBlank(param.getCaptchaToken())) {
+            captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
+        }
+
+
+        UserDO model = getProxy().getById(userDO.getId());
+        getProxy().afterAdd(model);
+
         // 删除验证码缓存
-        captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
     }
 
     public List<MenuOutputDTO> getMenuList(String userId) {
@@ -565,6 +677,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Caching(evict = {
             @CacheEvict(key = "#p1.id"),
             @CacheEvict(key = "'userName:' + #p1.username"),
+            @CacheEvict(key = "'email:' + #p1.email"),
     })
     protected void afterUpdate(UserDO paramDO, UserDO modelDO) { }
 
@@ -572,6 +685,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'userName:' + #p0.username"),
+            @CacheEvict(key = "'email:' + #p0.email"),
     })
     protected void afterDelete(UserDO model) {
         // 查询绑定的所有角色Id

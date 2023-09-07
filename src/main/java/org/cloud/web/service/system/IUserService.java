@@ -3,10 +3,12 @@ package org.cloud.web.service.system;
 import io.mybatis.mapper.BaseMapper;
 import org.cloud.model.common.PageData;
 import org.cloud.web.model.DO.system.UserDO;
+import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
 import org.cloud.web.model.DTO.in.system.UserDeptBindDTO;
 import org.cloud.web.model.DTO.in.system.UserLoginDTO;
+import org.cloud.web.model.DTO.in.system.UserMailBindDTO;
 import org.cloud.web.model.DTO.in.system.UserQueryPageDTO;
 import org.cloud.web.model.DTO.in.system.UserRegisterDTO;
 import org.cloud.web.model.DTO.in.system.UserRoleBindDTO;
@@ -21,7 +23,6 @@ public interface IUserService {
 
     BaseMapper<UserDO, String> getBaseMapper();
 
-    IUserService getProxy();
 
     /**
      * 通过用户ID获取用户信息
@@ -135,4 +136,8 @@ public interface IUserService {
     List<UserOutputDTO> list(UserQueryPageDTO param);
 
     void update(UserUpdateDTO param);
+
+    String getMailVerifyCode(MailVerifyCodeGetDTO param);
+
+    void bindMail(UserMailBindDTO param);
 }

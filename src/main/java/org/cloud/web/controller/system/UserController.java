@@ -15,9 +15,11 @@ import org.cloud.model.common.ResultData;
 import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DTO.in.EntityIdListDTO;
+import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
 import org.cloud.web.model.DTO.in.system.UserLoginDTO;
+import org.cloud.web.model.DTO.in.system.UserMailBindDTO;
 import org.cloud.web.model.DTO.in.system.UserQueryPageDTO;
 import org.cloud.web.model.DTO.in.system.UserRegisterDTO;
 import org.cloud.web.model.DTO.in.system.UserRoleBindDTO;
@@ -192,6 +194,24 @@ public class UserController {
     @SaCheckPermission("user.update")
     public ResultData<Void> update(@Validated @RequestBody UserUpdateDTO param) {
         service.update(param);
+        return ResultData.OK;
+    }
+
+
+    @SaCheckLogin
+    @Operation(summary = "获取邮箱验证码", description = "绑定邮箱前获取邮箱验证码及会话Token")
+    @GetMapping("/mail/bind/getVerifyCode")
+    public ResultData<String> getMailVerifyCode(@Validated MailVerifyCodeGetDTO param) {
+        param.setLoginUserId(LoginUtils.getLoginUserId());
+        return ResultData.ok(service.getMailVerifyCode(param));
+    }
+
+    @SaCheckLogin
+    @Operation(summary = "绑定邮箱", description = "绑定邮箱")
+    @PostMapping("/mail/bind")
+    public ResultData<Void> bindMail(@Validated @RequestBody UserMailBindDTO param) {
+        param.setLoginUserId(LoginUtils.getLoginUserId());
+        service.bindMail(param);
         return ResultData.OK;
     }
 }

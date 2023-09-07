@@ -20,6 +20,14 @@ spring:
       database: 12
   application:
     name: van-template-api
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: QQ邮箱地址
+    password: 邮箱STMP密码
+    default-encoding: UTF-8
+    protocol: smtps # QQ邮箱必须使用smtps协议, 否则会报错
+    from: QQ邮箱地址
 
 
 
