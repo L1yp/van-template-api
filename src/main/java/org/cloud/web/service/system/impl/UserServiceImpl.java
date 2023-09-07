@@ -25,7 +25,6 @@ import org.cloud.util.MessageUtils;
 import org.cloud.util.PinyinUtil;
 import org.cloud.util.SpringContext;
 import org.cloud.util.TokenUtil;
-import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
@@ -246,14 +245,14 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                 return result;
             }
 
-            if (StringUtils.isBlank(param.getTwoFACode())) {
+            if (StringUtils.isBlank(param.getTFACode())) {
                 // 需要填写验证码
                 var result = new UserLoginResultDTO();
                 result.setStatus(UserLoginResultStatus.MISS_TFA_CODE.getValue());
                 return result;
             }
 
-            boolean verifyFlag = AuthenticatorUtils.verifyCode(userTwoFAKeyModel.getSecretKey(), param.getTwoFACode());
+            boolean verifyFlag = AuthenticatorUtils.verifyCode(userTwoFAKeyModel.getSecretKey(), param.getTFACode());
             if (!verifyFlag) {
                 throw new BusinessException(400, MessageUtils.getMessage("authenticator.verify.error"));
             }

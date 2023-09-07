@@ -30,7 +30,7 @@ public class UserLoginDTO {
     private String captchaCode;
 
     @Schema(description = "Google Auth 验证码")
-    private String twoFACode;
+    private String TFACode;
 
     @JsonIgnore
     @Schema(hidden = true)
