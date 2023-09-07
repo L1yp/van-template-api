@@ -112,10 +112,9 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     @Override
     protected void preparePageQuery(ExampleWrapper<UserDO, String> wrapper, UserQueryPageDTO pageDTO) {
-        UserQueryPageDTO pageParam = (UserQueryPageDTO) pageDTO;
-        wrapper.eq(Objects.nonNull(pageParam.getStatus()), UserDO::getStatus, pageParam.getStatus());
-        if (StringUtils.isNotBlank(pageParam.getKeyword())) {
-            String keyword = escapeLikeSQL(pageParam.getKeyword());
+        wrapper.eq(Objects.nonNull(pageDTO.getStatus()), UserDO::getStatus, pageDTO.getStatus());
+        if (StringUtils.isNotBlank(pageDTO.getKeyword())) {
+            String keyword = escapeLikeSQL(pageDTO.getKeyword());
             wrapper.or(
                     it -> it.contains(UserDO::getUsername, keyword),
                     it -> it.contains(UserDO::getNickname, keyword),
