@@ -225,6 +225,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                 addDTO.setType(tfaConfig.getType());
                 addDTO.setSecretKey(secretKey);
                 addDTO.setBound(false);
+                addDTO.setCreateBy(user.getId());
                 userTwoFAKeyService.insert(addDTO);
 
 
