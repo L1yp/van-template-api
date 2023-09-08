@@ -2,6 +2,7 @@ package org.cloud.controller.intercepter.aspect;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.undertow.util.Headers;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -92,6 +93,8 @@ public class LogAspect {
                 return false;
             }
 
+            String userAgent = request.getHeader(Headers.USER_AGENT_STRING);
+            model.setUserAgent(userAgent);
             model.setRequestId(MDC.get(RequestUniqueIdInterceptor.REQUEST_ID));
             model.setMethod(request.getMethod());
             model.setUrl(request.getRequestURI());

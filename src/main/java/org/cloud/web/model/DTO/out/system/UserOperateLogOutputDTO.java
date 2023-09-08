@@ -39,6 +39,9 @@ public class UserOperateLogOutputDTO extends AbstractOutputDTO<UserOperateLogDO>
     @Schema(description = "请求IP")
     private String requestIp;
 
+    @Schema(description = "请求UA")
+    private String userAgent;
+
     @Schema(description = "响应码")
     private Integer responseCode;
 

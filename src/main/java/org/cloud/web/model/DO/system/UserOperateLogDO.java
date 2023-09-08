@@ -29,4 +29,6 @@ public class UserOperateLogDO extends AbstractModel<UserOperateLogOutputDTO> {
 
     private String requestIp;
 
+    private String userAgent;
+
 }
