@@ -31,4 +31,6 @@ public class UserOperateLogDO extends AbstractModel<UserOperateLogOutputDTO> {
 
     private String userAgent;
 
+    private String token;
+
 }
