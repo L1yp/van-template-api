@@ -10,6 +10,7 @@ import org.cloud.model.AbstractUpdateDTO;
 import org.cloud.model.Converter;
 import org.cloud.model.common.PageDTO;
 import org.cloud.model.common.PageData;
+import org.cloud.mybatis.Mapper;
 import org.cloud.mybatis.MapperUtil;
 import org.cloud.util.MessageUtils;
 import org.cloud.util.SQLTool;
@@ -25,7 +26,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<DTO>, DTO extends Converter<DO>, QueryDTO extends PageDTO> {
 
-    protected BaseMapper<DO, String> baseMapper;
+    protected Mapper<DO, String> baseMapper;
 
     public AbstractService() {
         Type genericSuperclass = getClass().getGenericSuperclass();
@@ -40,7 +41,7 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
 
 
     @SuppressWarnings("unchecked")
-    private AbstractService<DO, DTO, QueryDTO> getProxy() {
+    protected AbstractService<DO, DTO, QueryDTO> getProxy() {
         return (AbstractService<DO, DTO, QueryDTO>) AopContext.currentProxy();
     }
 

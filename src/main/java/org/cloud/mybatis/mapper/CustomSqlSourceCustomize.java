@@ -4,6 +4,7 @@ import io.mybatis.provider.EntityColumn;
 import io.mybatis.provider.EntityTable;
 import io.mybatis.provider.SqlSourceCustomize;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -22,6 +23,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,23 +50,18 @@ public class CustomSqlSourceCustomize implements SqlSourceCustomize {
             Set<String> excludeFields = Set.of(entity.excludeFields());
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
             if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {
-                MetaObject metaObject = ms.getConfiguration().newMetaObject(parameterObject);
-                if (parameterObject instanceof AbstractModel<?> && sqlCommandType == SqlCommandType.INSERT) {
-                    setCommonField(excludeFields, metaObject, CREATE_BY, loginUserId);
-                    setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
-                    setCommonField(excludeFields, metaObject, UPDATE_TIME, now);
-                    setCommonField(excludeFields, metaObject, CREATE_TIME, now);
-                }
-                if (sqlCommandType == SqlCommandType.UPDATE) {
-                    if (parameterObject instanceof AbstractWithUpdateModel<?>) {
-                        setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
-                        setCommonField(excludeFields, metaObject, UPDATE_TIME, now);
-                    } else {
-                        // 处理非AbstractWithUpdateModel子类也需要自动填充的字段
-                        setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
-                        setCommonField(excludeFields, metaObject, UPDATE_TIME, loginUserId);
+                if (ms.getId().equals("org.cloud.web.mapper.business.SensitiveStopWordMapper.insertList")) {
+                    if (parameterObject instanceof ParamMap<?> paramMap) {
+                        Collection<?> list = (Collection<?>) paramMap.get("list");
+                        for (Object item : list) {
+                            setDefaultParam(ms, sqlCommandType, excludeFields, item, now, loginUserId);
+                        }
                     }
                 }
+                else {
+                    setDefaultParam(ms, sqlCommandType, excludeFields, parameterObject, now, loginUserId);
+                }
+
             }
 
 
@@ -109,6 +106,26 @@ public class CustomSqlSourceCustomize implements SqlSourceCustomize {
 
             return boundSql;
         };
+    }
+
+    private void setDefaultParam(MappedStatement ms, SqlCommandType sqlCommandType, Set<String> excludeFields, Object parameterObject, LocalDateTime now, String loginUserId) {
+        MetaObject metaObject = ms.getConfiguration().newMetaObject(parameterObject);
+        if (parameterObject instanceof AbstractModel<?> && sqlCommandType == SqlCommandType.INSERT) {
+            setCommonField(excludeFields, metaObject, CREATE_BY, loginUserId);
+            setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
+            setCommonField(excludeFields, metaObject, UPDATE_TIME, now);
+            setCommonField(excludeFields, metaObject, CREATE_TIME, now);
+        }
+        if (sqlCommandType == SqlCommandType.UPDATE) {
+            if (parameterObject instanceof AbstractWithUpdateModel<?>) {
+                setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
+                setCommonField(excludeFields, metaObject, UPDATE_TIME, now);
+            } else {
+                // 处理非AbstractWithUpdateModel子类也需要自动填充的字段
+                setCommonField(excludeFields, metaObject, UPDATE_BY, loginUserId);
+                setCommonField(excludeFields, metaObject, UPDATE_TIME, loginUserId);
+            }
+        }
     }
 
     private void setCommonField(Set<String> excludeFields, MetaObject metaObject, String field, Object value) {

@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.RoleMenuDO;
 
-public interface RoleMenuMapper extends BaseMapper<RoleMenuDO, String> {
+public interface RoleMenuMapper extends Mapper<RoleMenuDO, String> {
 }

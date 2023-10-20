@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.UserTwoFAKeyDO;
 
-public interface UserTwoFAKeyMapper extends BaseMapper<UserTwoFAKeyDO, String> {
+public interface UserTwoFAKeyMapper extends Mapper<UserTwoFAKeyDO, String> {
 }

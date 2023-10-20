@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.PermDO;
 
-public interface PermMapper extends BaseMapper<PermDO, String> {
+public interface PermMapper extends Mapper<PermDO, String> {
 }

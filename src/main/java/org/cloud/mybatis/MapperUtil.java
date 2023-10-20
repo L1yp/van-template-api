@@ -1,6 +1,5 @@
 package org.cloud.mybatis;
 
-import io.mybatis.mapper.BaseMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,20 +23,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MapperUtil implements InitializingBean {
 
     @Resource
-    Map<String, BaseMapper<?, ?>> mapperMap;
+    Map<String, Mapper<?, ?>> mapperMap;
 
 
-    private final static Map<Type, BaseMapper<?, ?>> entityMapperMap = new ConcurrentHashMap<>(64);
+    private final static Map<Type, Mapper<?, ?>> entityMapperMap = new ConcurrentHashMap<>(64);
     
     @Override
     public void afterPropertiesSet() throws Exception {
-        Set<Entry<String, BaseMapper<?, ?>>> entries = mapperMap.entrySet();
-        for (Entry<String, BaseMapper<?, ?>> entry : entries) {
-            BaseMapper<?, ?> mapper = entry.getValue();
+        Set<Entry<String, Mapper<?, ?>>> entries = mapperMap.entrySet();
+        for (Entry<String, Mapper<?, ?>> entry : entries) {
+            Mapper<?, ?> mapper = entry.getValue();
             List<Type> types = getGenericInterfaces(mapper.getClass());
             for (Type type : types) {
                 if (type instanceof ParameterizedType parameterizedType) {
-                    if (parameterizedType.getRawType().equals(BaseMapper.class)) {
+                    if (parameterizedType.getRawType().equals(Mapper.class)) {
                         Type entityClazz = parameterizedType.getActualTypeArguments()[0];
                         entityMapperMap.put(entityClazz, mapper);
                         break;
@@ -64,8 +63,8 @@ public class MapperUtil implements InitializingBean {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, PK extends Serializable> BaseMapper<T, PK> getMapper(Type entityClazz) {
-        return (BaseMapper<T, PK>) entityMapperMap.get(entityClazz);
+    public static <T, PK extends Serializable> Mapper<T, PK> getMapper(Type entityClazz) {
+        return (Mapper<T, PK>) entityMapperMap.get(entityClazz);
     }
     
 }
