@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
 
-public interface UserLoginLogMapper extends BaseMapper<UserLoginLogDO, String> {
+public interface UserLoginLogMapper extends Mapper<UserLoginLogDO, String> {
 }

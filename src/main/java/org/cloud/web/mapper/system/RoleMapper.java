@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.RoleDO;
 
-public interface RoleMapper extends BaseMapper<RoleDO, String> {
+public interface RoleMapper extends Mapper<RoleDO, String> {
 }

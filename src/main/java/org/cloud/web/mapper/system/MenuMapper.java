@@ -1,7 +1,7 @@
 package org.cloud.web.mapper.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.MenuDO;
 
-public interface MenuMapper extends BaseMapper<MenuDO, String> {
+public interface MenuMapper extends Mapper<MenuDO, String> {
 }
