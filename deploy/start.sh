@@ -1,7 +1,7 @@
 TODAY=`date +'%Y-%m-%d'`
 
 SRVNAME=van-template-api
-BASEDIR=/data/SRVNAME
+BASEDIR=/data/$SRVNAME
 JARNAME=$SRVNAME.jar
 JAVAEXE=$JAVA_HOME/bin/java
 
@@ -15,7 +15,7 @@ ulimit -n 65535
 
 cd $BASEDIR
 
-$JAVAEXE -server --enable-preview -Dspring.profiles.active=prod -XX:+ShowCodeDetailsInExceptionMessages -XX:MetaspaceSize=128m -Xms512M -jar $JARFILE  > $BASEDIR/logs/runtime.${TODAY}.log &
+$JAVAEXE -server --enable-preview -Dspring.profiles.active=prod -XX:+ShowCodeDetailsInExceptionMessages -XX:MetaspaceSize=128m -Xms512M --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED -jar $JARFILE  > $BASEDIR/logs/runtime.${TODAY}.log &
 
 
 exit 0
