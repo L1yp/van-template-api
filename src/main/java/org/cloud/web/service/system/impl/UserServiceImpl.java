@@ -613,6 +613,12 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
      */
     @Override
     protected void prepareAdd(UserDO model) {
+
+        UserDO userDO = getProxy().getByUserName(model.getUsername());
+        if (userDO != null) {
+            throw new BusinessException(500, MessageUtils.getMessage("username.duplicate.uidx"));
+        }
+
         if (StringUtils.isNotBlank(model.getNickname())) {
             model.setNicknamePinyin(PinyinUtil.getPinyin(model.getNickname()));
         }
