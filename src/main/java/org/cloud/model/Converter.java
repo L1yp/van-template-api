@@ -1,6 +1,5 @@
 package org.cloud.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloud.util.BeanCopierUtil;
 
 import java.lang.reflect.ParameterizedType;
@@ -35,8 +34,7 @@ public interface Converter<T> {
             AbstractWithUpdateOutputDTO.class, AbstractTreeOutputDTO.class, AbstractWithUpdateTreeOutputDTO.class
     ));
 
-    @JsonIgnore
-    default ParameterizedType getCurrentGenericInterface() {
+    default ParameterizedType currentGenericInterface() {
         Class<?> superClazz = getClass();
         Type type = null;
         while (!superClazz.equals(Object.class)) {
@@ -61,9 +59,8 @@ public interface Converter<T> {
     }
 
     @SuppressWarnings("unchecked")
-    @JsonIgnore
     default Class<T> getTargetType() {
-        ParameterizedType parameterizedType = getCurrentGenericInterface();
+        ParameterizedType parameterizedType = currentGenericInterface();
         if (parameterizedType == null) {
             return null;
         }
