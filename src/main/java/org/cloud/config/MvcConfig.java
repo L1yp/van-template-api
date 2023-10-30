@@ -3,6 +3,7 @@ package org.cloud.config;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.servlet.http.HttpServletRequest;
+import org.cloud.controller.intercepter.LoginInterceptor;
 import org.cloud.controller.intercepter.RequestUniqueIdInterceptor;
 import org.springdoc.api.AbstractOpenApiResource;
 import org.springdoc.webmvc.api.OpenApiResource;
@@ -68,10 +69,10 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/static/**")
                 .excludePathPatterns("/resources/**");
-//        registry.addInterceptor(new OperateRecordInterceptor())
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/static/**")
-//                .excludePathPatterns("/resources/**");
+        registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/static/**")
+                .excludePathPatterns("/resources/**");
     }
 
 

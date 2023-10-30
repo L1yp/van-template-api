@@ -1,17 +1,15 @@
 package org.cloud.web.context;
 
-import cn.dev33.satoken.stp.StpUtil;
+import org.cloud.controller.intercepter.LoginInterceptor;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class LoginUtils {
 
     public static String getLoginUserId() {
-        if (RequestContextHolder.getRequestAttributes() != null) {
-            String tokenValue = StpUtil.getTokenValue();
-            if (tokenValue == null) {
-                return null;
-            }
-            return StpUtil.stpLogic.getLoginIdNotHandle(tokenValue);
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            return (String) requestAttributes.getRequest().getAttribute(LoginInterceptor.LOGIN_USER_ID);
         }
         return null;
     }
