@@ -25,6 +25,7 @@ import org.cloud.util.MessageUtils;
 import org.cloud.util.PinyinUtil;
 import org.cloud.util.SpringContext;
 import org.cloud.util.TokenUtil;
+import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
@@ -270,6 +271,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
 
         StpUtil.login(user.getId());
+        LoginUtils.setLoginUserId(user.getId());
 
         if (StringUtils.isNotBlank(param.getCaptchaToken())) {
             // 删除验证码缓存

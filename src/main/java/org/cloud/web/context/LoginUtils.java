@@ -14,4 +14,11 @@ public class LoginUtils {
         return null;
     }
 
+    public static void setLoginUserId(String loginUserId) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            requestAttributes.getRequest().setAttribute(LoginInterceptor.LOGIN_USER_ID, loginUserId);
+        }
+    }
+
 }
