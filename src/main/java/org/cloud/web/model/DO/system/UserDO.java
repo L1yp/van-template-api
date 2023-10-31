@@ -1,5 +1,6 @@
 package org.cloud.web.model.DO.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.mybatis.provider.Entity.Column;
 import io.mybatis.provider.Entity.Table;
 import lombok.Getter;
@@ -40,6 +41,7 @@ public class UserDO extends AbstractWithUpdateModel<UserOutputDTO> {
     @Column(typeHandler = BasicEnumTypeHandler.class)
     private CommonStatus status;
 
+    @JsonIgnore
     public boolean isValid() {
         return status == CommonStatus.ENABLE;
     }
