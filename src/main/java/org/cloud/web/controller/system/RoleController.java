@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+import org.apache.commons.lang3.StringUtils;
 import org.cloud.model.common.ResultData;
 import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DTO.in.system.RoleAddDTO;
@@ -41,6 +42,9 @@ public class RoleController {
     @PostMapping("/add")
     @Operation(summary = "新增角色")
     public ResultData<Void> add(@RequestBody @Validated RoleAddDTO param) {
+        if (StringUtils.isBlank(param.getCategory())) {
+            param.setCategory("默认");
+        }
         roleService.insertSelective(param);
         return ResultData.OK;
     }

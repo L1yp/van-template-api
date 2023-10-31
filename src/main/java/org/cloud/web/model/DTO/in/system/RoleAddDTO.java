@@ -12,14 +12,13 @@ import org.cloud.web.model.DO.system.RoleDO;
 
 @Getter
 @Setter
-@Schema(description = "新增菜单类型")
+@Schema(description = "新增角色类型")
 public class RoleAddDTO implements Converter<RoleDO> {
 
     @NotBlank
     @Schema(description = "角色名称")
     private String name;
 
-    @NotBlank
     @Schema(description = "角色分类")
     private String category;
 
