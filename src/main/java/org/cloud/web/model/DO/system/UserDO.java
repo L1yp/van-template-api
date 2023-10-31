@@ -40,4 +40,8 @@ public class UserDO extends AbstractWithUpdateModel<UserOutputDTO> {
     @Column(typeHandler = BasicEnumTypeHandler.class)
     private CommonStatus status;
 
+    public boolean isValid() {
+        return status == CommonStatus.ENABLE;
+    }
+
 }

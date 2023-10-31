@@ -14,7 +14,7 @@ public interface Converter<T> {
 
     default T convert() {
         // 获取泛型类型 T 的 Class 对象
-        Class<T> targetType = getTargetType();
+        Class<T> targetType = targetType();
         if (targetType == null) {
             return null;
         }
@@ -59,7 +59,7 @@ public interface Converter<T> {
     }
 
     @SuppressWarnings("unchecked")
-    default Class<T> getTargetType() {
+    default Class<T> targetType() {
         ParameterizedType parameterizedType = currentGenericInterface();
         if (parameterizedType == null) {
             return null;
