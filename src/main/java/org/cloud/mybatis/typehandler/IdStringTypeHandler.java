@@ -12,7 +12,12 @@ public class IdStringTypeHandler implements TypeHandler<String> {
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
         if (jdbcType == JdbcType.BIGINT) {
-            ps.setLong(i, Long.parseLong(parameter));
+            if (parameter == null) {
+                ps.setNull(i, jdbcType.TYPE_CODE);
+            } else {
+                ps.setLong(i, Long.parseLong(parameter));
+
+            }
         } else {
             ps.setString(i, parameter);
         }
