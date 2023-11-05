@@ -42,6 +42,7 @@ public class CustomSqlSourceCustomize implements SqlSourceCustomize {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public SqlSource customize(SqlSource sqlSource, EntityTable entity, MappedStatement ms, ProviderContext context) {
         return parameterObject -> {
             LocalDateTime now = LocalDateTime.now();
@@ -50,12 +51,10 @@ public class CustomSqlSourceCustomize implements SqlSourceCustomize {
             Set<String> excludeFields = Set.of(entity.excludeFields());
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
             if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {
-                if (ms.getId().equals("org.cloud.web.mapper.business.SensitiveStopWordMapper.insertList")) {
-                    if (parameterObject instanceof ParamMap<?> paramMap) {
-                        Collection<?> list = (Collection<?>) paramMap.get("list");
-                        for (Object item : list) {
-                            setDefaultParam(ms, sqlCommandType, excludeFields, item, now, loginUserId);
-                        }
+                if (ms.getId().endsWith(".insertList") && (parameterObject instanceof ParamMap<?> paramMap) && paramMap.containsKey("entityList")) {
+                    Collection<?> list = (Collection<?>) paramMap.get("entityList");
+                    for (Object item : list) {
+                        setDefaultParam(ms, sqlCommandType, excludeFields, item, now, loginUserId);
                     }
                 }
                 else {
