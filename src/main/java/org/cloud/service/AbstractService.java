@@ -1,6 +1,5 @@
 package org.cloud.service;
 
-import io.mybatis.mapper.BaseMapper;
 import io.mybatis.mapper.example.ExampleWrapper;
 import io.mybatis.mapper.fn.Fn.Fns;
 import lombok.extern.slf4j.Slf4j;
@@ -256,7 +255,7 @@ public abstract class AbstractService<DO extends AbstractModel<DTO> & Converter<
      */
     protected void afterDelete(DO modelDO) { }
 
-    public BaseMapper<DO, String> getBaseMapper() {
+    public Mapper<DO, String> getBaseMapper() {
         return baseMapper;
     }
 

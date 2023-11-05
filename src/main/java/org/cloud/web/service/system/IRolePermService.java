@@ -1,13 +1,13 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.RolePermDO;
 
 import java.util.List;
 
 public interface IRolePermService {
 
-    BaseMapper<RolePermDO, String> getBaseMapper();
+    Mapper<RolePermDO, String> getBaseMapper();
 
     /**
      * 通过角色ID获取权限标识列表

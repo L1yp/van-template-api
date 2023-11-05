@@ -1,13 +1,13 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 
 import java.util.List;
 
 public interface IUserDepartmentService {
 
-    BaseMapper<UserDepartmentDO, String> getBaseMapper();
+    Mapper<UserDepartmentDO, String> getBaseMapper();
 
 
     /**

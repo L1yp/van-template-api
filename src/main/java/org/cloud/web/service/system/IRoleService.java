@@ -1,9 +1,9 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
 import org.cloud.model.AbstractUpdateDTO;
 import org.cloud.model.Converter;
 import org.cloud.model.common.PageDTO;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.RoleDO;
 import org.cloud.web.model.DTO.in.system.RoleMenuBindDTO;
 import org.cloud.web.model.DTO.in.system.RolePermBindDTO;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface IRoleService {
 
-    BaseMapper<RoleDO, String> getBaseMapper();
+    Mapper<RoleDO, String> getBaseMapper();
 
     /**
      * 通过角色ID获取角色信息

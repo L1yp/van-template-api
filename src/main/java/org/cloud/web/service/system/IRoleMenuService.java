@@ -1,13 +1,13 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.RoleMenuDO;
 
 import java.util.List;
 
 public interface IRoleMenuService {
 
-    BaseMapper<RoleMenuDO, String> getBaseMapper();
+    Mapper<RoleMenuDO, String> getBaseMapper();
 
     /**
      * 通过角色ID获取菜单ID列表

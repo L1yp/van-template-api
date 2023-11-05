@@ -1,6 +1,6 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.UserRoleDO;
 
 import java.util.List;
@@ -9,7 +9,7 @@ public interface IUserRoleService {
 
     void insert(UserRoleDO modelDO);
 
-    BaseMapper<UserRoleDO, String> getBaseMapper();
+    Mapper<UserRoleDO, String> getBaseMapper();
 
     /**
      * 通过用户ID获取角色ID列表

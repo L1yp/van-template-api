@@ -1,7 +1,7 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
 import org.cloud.model.common.PageData;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public interface IUserService {
 
-    BaseMapper<UserDO, String> getBaseMapper();
+    Mapper<UserDO, String> getBaseMapper();
 
 
     /**

@@ -1,9 +1,9 @@
 package org.cloud.web.service.system;
 
-import io.mybatis.mapper.BaseMapper;
 import org.cloud.model.AbstractUpdateDTO;
 import org.cloud.model.Converter;
 import org.cloud.model.common.PageDTO;
+import org.cloud.mybatis.Mapper;
 import org.cloud.web.model.DO.system.PermDO;
 import org.cloud.web.model.DTO.out.system.PermOutputDTO;
 
@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 public interface IPermService {
 
-    BaseMapper<PermDO, String> getBaseMapper();
+    Mapper<PermDO, String> getBaseMapper();
 
     /**
      * 通过权限标识获取权限信息
