@@ -137,10 +137,13 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         if (userDO == null) {
             return null;
         }
-        getProxy().putUserNameCache(userDO.getUsername(), userDO);
+        List<String> keys = new ArrayList<>();
+        keys.add("userName:" + userDO.getUsername());
         if (StringUtils.isNotBlank(userDO.getEmail())) {
-            getProxy().putUserEmailCache(userDO.getEmail(), userDO);
+            keys.add("email:" + userDO.getEmail());
         }
+        userDO.setCacheKeys(keys);
+        userDO.setCacheHit(false);
         return userDO;
     }
 
@@ -151,11 +154,13 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         if (userDO == null) {
             return null;
         }
-        IUserService userService = (IUserService) AopContext.currentProxy();
-        userService.putIdCache(userDO.getId(), userDO);
+        List<String> keys = new ArrayList<>();
+        keys.add(userDO.getId());
         if (StringUtils.isNotBlank(userDO.getEmail())) {
-            getProxy().putUserEmailCache(userDO.getEmail(), userDO);
+            keys.add("email:" + userDO.getEmail());
         }
+        userDO.setCacheKeys(keys);
+        userDO.setCacheHit(false);
         return userDO;
     }
 
@@ -165,28 +170,13 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         if (userDO == null) {
             return null;
         }
-        IUserService userService = (IUserService) AopContext.currentProxy();
-        userService.putIdCache(userDO.getId(), userDO);
-        getProxy().putUserNameCache(userDO.getUsername(), userDO);
-
+        List<String> keys = new ArrayList<>();
+        keys.add(userDO.getId());
+        keys.add("userName:" + userDO.getUsername());
+        userDO.setCacheKeys(keys);
+        userDO.setCacheHit(false);
         return userDO;
     }
-
-    @CachePut(key = "#userId")
-    public UserDO putIdCache(String userId, UserDO model) {
-        return model;
-    }
-
-    @CachePut(key = "'userName:' + #userName")
-    public UserDO putUserNameCache(String userName, UserDO model) {
-        return model;
-    }
-
-    @CachePut(key = "'email:' + #email")
-    public UserDO putUserEmailCache(String email, UserDO model) {
-        return model;
-    }
-
 
     @Resource
     IUserLoginLogService userLoginLogService;
@@ -480,13 +470,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     }
 
     @Override
-    protected void afterAdd(UserDO model) {
-        getProxy().putIdCache(model.getId(), model);
-        getProxy().putUserNameCache(model.getUsername(), model);
-        if (StringUtils.isNotBlank(model.getEmail())) {
-            getProxy().putUserEmailCache(model.getEmail(), model);
-        }
-    }
+    protected void afterAdd(UserDO model) { }
 
     @Transactional
     public void register(UserRegisterDTO param) {
@@ -684,7 +668,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Caching(evict = {
             @CacheEvict(key = "#p1.id"),
             @CacheEvict(key = "'userName:' + #p1.username"),
-            @CacheEvict(key = "'email:' + #p1.email"),
+            @CacheEvict(key = "'email:' + #p1.email", condition = "#p1.email != null"),
     })
     protected void afterUpdate(UserDO paramDO, UserDO modelDO) { }
 
@@ -692,7 +676,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'userName:' + #p0.username"),
-            @CacheEvict(key = "'email:' + #p0.email"),
+            @CacheEvict(key = "'email:' + #p0.email", condition = "#p0.email != null"),
     })
     protected void afterDelete(UserDO model) {
         // 查询绑定的所有角色Id

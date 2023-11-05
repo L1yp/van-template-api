@@ -38,10 +38,6 @@ public interface IUserService {
      */
     UserDO getByUserName(String userName);
 
-    UserDO putIdCache(String userId, UserDO model);
-
-    UserDO putUserNameCache(String userName, UserDO model);
-
     /**
      * 用户分页列表
      * @param param
