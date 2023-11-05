@@ -54,10 +54,10 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        resetTypeHandlerInResultMapping();
         // 自动构建resultMap
         autoBuildResultMap(configuration, mapperAutoResultMap.getCandidateBuildResultMapTypeList());
 
+        resetTypeHandlerInResultMapping();
     }
 
     public void resetTypeHandlerInResultMapping() {
