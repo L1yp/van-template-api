@@ -113,9 +113,6 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
     public void getMapperResultTypeList(Class<?> mapperClazz, Set<Class<?>> candidateBuildResultMapTypeList) {
         // 获取mapper的第一个泛型参数类型
         Class<?> mapperDOType = getMapperDOType(mapperClazz);
-        if (mapperDOType == null) {
-            return;
-        }
         Method[] methods = mapperClazz.getMethods();
         for (Method declaredMethod : methods) {
             // 获取方法所在定义类
@@ -134,7 +131,7 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
                     continue;
                 }
                 Type actualTypeArgument = actualTypeArguments[0];
-                if (actualTypeArgument == mapperDOType) {
+                if (mapperDOType != null && actualTypeArgument == mapperDOType) {
                     continue;
                 }
                 if (actualTypeArgument instanceof Class<?> genericType) {
@@ -147,7 +144,7 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
             // 返回值是直接类型
             else if (genericReturnType instanceof Class<?> returnClazz) {
                 // 返回值是DO类型，无需重复生成result map
-                if (returnClazz == mapperDOType) {
+                if (mapperDOType != null && returnClazz == mapperDOType) {
                     continue;
                 }
                 if (returnClazz.isAnnotationPresent(Table.class)) {
