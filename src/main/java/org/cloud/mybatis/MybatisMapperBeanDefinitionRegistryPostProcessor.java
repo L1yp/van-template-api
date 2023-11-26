@@ -26,7 +26,6 @@ public class MybatisMapperBeanDefinitionRegistryPostProcessor implements BeanDef
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        log.info("beanFactory: {}", beanFactory);
         String[] beanDefinitionNames = beanFactory.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             if (!beanDefinitionName.endsWith("Mapper")) {
