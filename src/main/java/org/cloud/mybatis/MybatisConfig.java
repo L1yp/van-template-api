@@ -144,9 +144,9 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
             // 返回值是直接类型
             else if (genericReturnType instanceof Class<?> returnClazz) {
                 // 返回值是DO类型，无需重复生成result map
-                if (mapperDOType != null && returnClazz == mapperDOType) {
-                    continue;
-                }
+                // if (mapperDOType != null && returnClazz == mapperDOType) {
+                //    continue;
+                // } // 由于mybatis-mapper的Mapper Entity的ResultMap是懒加载, 无法在自定义方法返回值中使用, 因此此处也需要构建ResultMap
                 if (returnClazz.isAnnotationPresent(Table.class)) {
                     candidateBuildResultMapTypeList.add(returnClazz);
                 }
