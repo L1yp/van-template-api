@@ -14,10 +14,6 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @EnableScheduling
 public class ScheduleConfig implements SchedulingConfigurer {
 
-    public ScheduleConfig() {
-        System.out.println("ddd");
-    }
-
     @Bean(name = ScheduledAnnotationBeanPostProcessor.DEFAULT_TASK_SCHEDULER_BEAN_NAME)
     public ThreadPoolTaskScheduler taskScheduler(){
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
