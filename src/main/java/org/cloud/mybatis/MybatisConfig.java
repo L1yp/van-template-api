@@ -61,6 +61,7 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
         Set<Class<?>> resultTypeList = new HashSet<>();
         mapperClazzList.forEach(clazz -> getMapperResultTypeList(clazz, resultTypeList));
         autoBuildResultMap(configuration, resultTypeList);
+        resetTypeHandlerInResultMapping();
     }
 
     @Override
