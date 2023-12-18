@@ -190,7 +190,7 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
             builder.flags(flags);
             resultMappings.add(builder.build());
         }
-        String resultMapId = entityTable.entityClass().getName() + "." + EntityTable.RESULT_MAP_NAME;
+        String resultMapId = EntityTable.RESULT_MAP_NAME + "." + entityTable.entityClass().getSimpleName();
         ResultMap.Builder builder = new ResultMap.Builder(configuration, resultMapId, entityTable.entityClass(), resultMappings, true);
         return builder.build();
     }
