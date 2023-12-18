@@ -131,9 +131,10 @@ public class MybatisConfig implements ConfigurationCustomizer, ApplicationListen
                     continue;
                 }
                 Type actualTypeArgument = actualTypeArguments[0];
-                if (mapperDOType != null && actualTypeArgument == mapperDOType) {
-                    continue;
-                }
+                // 由于mybatis-mapper的Mapper Entity的ResultMap是懒加载, 无法在自定义方法返回值中使用, 因此此处也需要构建ResultMap
+                //  if (mapperDOType != null && actualTypeArgument == mapperDOType) {
+                //      continue;
+                //  }
                 if (actualTypeArgument instanceof Class<?> genericType) {
                     if (genericType.isAnnotationPresent(Table.class)) {
                         candidateBuildResultMapTypeList.add(genericType);
