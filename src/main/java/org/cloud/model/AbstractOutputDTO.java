@@ -1,5 +1,6 @@
 package org.cloud.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public abstract class AbstractOutputDTO<DO> implements Converter<DO> {
     @Schema(description = "创建者ID", requiredMode = RequiredMode.REQUIRED)
     private String createBy;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "创建时间", requiredMode = RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
