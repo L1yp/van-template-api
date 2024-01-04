@@ -54,6 +54,8 @@ public class UserController {
     @Resource
     IUserService service;
 
+    String defaultRole = "2";
+
     HttpServletRequest getRequest() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes == null) {
@@ -149,7 +151,6 @@ public class UserController {
         if (StringUtils.isBlank(param.getParentId())) {
             param.setParentId(null);
         }
-        String defaultRole = "2";
         if (CollectionUtils.isEmpty(param.getRoleIdList())) {
             param.setRoleIdList(List.of(defaultRole)); // use config service get default role
         } else if (param.getRoleIdList().contains(defaultRole)) {
@@ -193,6 +194,11 @@ public class UserController {
     @Operation(summary = "更新用户")
     @SaCheckPermission("user.update")
     public ResultData<Void> update(@Validated @RequestBody UserUpdateDTO param) {
+        if (CollectionUtils.isEmpty(param.getRoleIdList())) {
+            param.setRoleIdList(List.of(defaultRole)); // use config service get default role
+        } else if (param.getRoleIdList().contains(defaultRole)) {
+            param.getRoleIdList().add(defaultRole);
+        }
         service.update(param);
         return ResultData.OK;
     }
