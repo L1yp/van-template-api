@@ -40,24 +40,6 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
 
-    @Bean
-    public FilterRegistrationBean<RequestWrapperFilter> filterFilterRegistrationBean() {
-        var registry = new FilterRegistrationBean<RequestWrapperFilter>();
-//        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-//        filter.setIncludeHeaders(true);
-//        filter.setIncludePayload(true);
-//        filter.setIncludeClientInfo(true);
-//        filter.setIncludeQueryString(true);
-        registry.setFilter(new RequestWrapperFilter());
-        registry.addUrlPatterns("/*");
-        registry.setOrder(1);
-        registry.setName("RequestWrapperFilter");
-        return registry;
-
-    }
-
-
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new RequestUniqueIdInterceptor())

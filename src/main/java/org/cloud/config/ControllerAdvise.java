@@ -1,20 +1,13 @@
 package org.cloud.config;
 
-import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.exception.NotPermissionException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.cloud.controller.intercepter.aspect.LogAspect;
-import org.cloud.controller.intercepter.task.OperateLogStorageTask;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.common.ResultData;
-import org.cloud.util.SpringContext;
-import org.cloud.web.model.DO.system.UserOperateLogDO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -131,30 +124,6 @@ public class ControllerAdvise {
     public ResponseEntity<ResultData<Void>> handlerException(IOException e){
         log.error("handlerIOException", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultData.err(HttpStatus.INTERNAL_SERVER_ERROR.value(), "链接超时，请稍后重试，或联系管理员！", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
-
-    @ExceptionHandler(NotLoginException.class)
-    public ResponseEntity<ResultData<Void>> handlerNotLoginException(NotLoginException e){
-        log.error("handlerNotLoginException", e);
-        UserOperateLogDO model = LogAspect.getOperateLogModel();
-        if (model != null) {
-            model.setErrorMessage(e.getMessage());
-            ThreadPoolTaskScheduler taskScheduler = SpringContext.getBean(ThreadPoolTaskScheduler.class);
-            taskScheduler.execute(new OperateLogStorageTask(model));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResultData.err(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
-    }
-
-    @ExceptionHandler(NotPermissionException.class)
-    public ResponseEntity<ResultData<Void>> handlerNotPermissionException(NotPermissionException e){
-        log.error("handlerNotPermissionException", e);
-        UserOperateLogDO model = LogAspect.getOperateLogModel();
-        if (model != null) {
-            model.setErrorMessage(e.getMessage());
-            ThreadPoolTaskScheduler taskScheduler = SpringContext.getBean(ThreadPoolTaskScheduler.class);
-            taskScheduler.execute(new OperateLogStorageTask(model));
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResultData.err(HttpStatus.FORBIDDEN.value(), e.getMessage()));
     }
 
 

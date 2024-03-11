@@ -10,11 +10,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoginInterceptor implements HandlerInterceptor {
 
     public static final String LOGIN_USER_ID = "LOGIN_USER_ID";
+    public static final String LOGIN_USER_TOKEN = "LOGIN_USER_TOKEN";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Object loginUserId = StpUtil.getLoginIdDefaultNull();
+        Object token = StpUtil.getTokenValueNotCut();
         request.setAttribute(LOGIN_USER_ID, loginUserId);
+        request.setAttribute(LOGIN_USER_TOKEN, token);
         return true;
     }
 }
