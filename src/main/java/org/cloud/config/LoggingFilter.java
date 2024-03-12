@@ -84,7 +84,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             param = new String(bytesBody, characterEncoding);
         }
 
-        String requestId = MDC.get(RequestUniqueIdInterceptor.REQUEST_ID);
+        String requestId = response.getHeader(RequestUniqueIdInterceptor.REQUEST_ID_HEADER_KEY);
         String method = request.getMethod();
         String url = request.getRequestURI();
 
