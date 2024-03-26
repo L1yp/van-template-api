@@ -2,7 +2,12 @@ package org.cloud.util;
 
 import org.cloud.model.enums.base.BasicEnum;
 import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.cglib.core.Converter;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +21,37 @@ public class BeanCopierUtil {
         Class<?> targetClazz = target.getClass();
         BeanCopierKey beanCopierKey = BeanCopierKey.buildKey(sourceClazz, targetClazz);
         BeanCopier beanCopier = CACHE.computeIfAbsent(beanCopierKey, k -> BeanCopier.create(sourceClazz, targetClazz, true));
-        beanCopier.copy(source, target, (value, targetClass, context) -> {
+        beanCopier.copy(source, target, new BeanCopierConverter());
+    }
+
+    public static <T> List<T> copyList(List<?> sourceList, Class<T> targetClazz) {
+        if (CollectionUtils.isEmpty(sourceList)) {
+            return Collections.emptyList();
+        }
+
+        Class<?> sourceClazz = sourceList.getFirst().getClass();
+        BeanCopierKey beanCopierKey = BeanCopierKey.buildKey(sourceClazz, targetClazz);
+        BeanCopier beanCopier = CACHE.computeIfAbsent(beanCopierKey, k -> BeanCopier.create(sourceClazz, targetClazz, true));
+
+        List<T> result = new ArrayList<>();
+        for (Object source : sourceList) {
+            T t = null;
+            try {
+                t = targetClazz.getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            beanCopier.copy(source, t, new BeanCopierConverter());
+            result.add(t);
+        }
+
+        return result;
+    }
+
+    private static class BeanCopierConverter implements Converter {
+
+        @Override
+        public Object convert(Object value, Class targetClass, Object context) {
             if (value == null) {
                 return null;
             }
@@ -39,9 +74,8 @@ public class BeanCopierUtil {
                 }
             }
             return null;
-        });
+        }
     }
-
 
     private static class BeanCopierKey {
         public Class<?> sourceClazz;
