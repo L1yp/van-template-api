@@ -69,6 +69,9 @@ public class LoggingFilter extends OncePerRequestFilter {
             if (mergedAnnotationAttributes != null) {
                 objectType = mergedAnnotationAttributes.getString("name");
             }
+            if (objectType == null) {
+                return;
+            }
 
             Method method = handlerMethod.getMethod();
             mergedAnnotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(method, "io.swagger.v3.oas.annotations.Operation");
@@ -76,6 +79,7 @@ public class LoggingFilter extends OncePerRequestFilter {
                 summary = mergedAnnotationAttributes.getString("summary");
             }
         }
+
 
         String param = null;
         byte[] bytesBody = requestWrapper.getContentAsByteArray();
