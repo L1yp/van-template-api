@@ -4,7 +4,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.cloud.cache.CacheResultType;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,12 +21,6 @@ public class CacheResultTypeAop {
         Type returnType = null;
         if (joinPoint.getSignature() instanceof MethodSignature signature) {
             returnType = signature.getMethod().getGenericReturnType();
-            if (signature.getMethod().isAnnotationPresent(CacheResultType.class)) {
-                CacheResultType cacheResultType = signature.getMethod().getAnnotation(CacheResultType.class);
-                if (cacheResultType.value() != null) {
-                    returnType = cacheResultType.value();
-                }
-            }
         }
         try {
             CacheResultTypeContext.setType(returnType);

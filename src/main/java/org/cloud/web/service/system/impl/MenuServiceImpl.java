@@ -2,8 +2,6 @@ package org.cloud.web.service.system.impl;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.cloud.cache.CacheTTL;
-import org.cloud.cache.LocalCache;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
@@ -27,7 +25,6 @@ import java.util.List;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "menu")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class MenuServiceImpl extends AbstractService<MenuDO, MenuOutputDTO, PageDTO> implements IMenuService {
 
     @Resource
@@ -37,14 +34,12 @@ public class MenuServiceImpl extends AbstractService<MenuDO, MenuOutputDTO, Page
     IRoleService roleService;
 
     @Override
-    @LocalCache
     @Cacheable(key = "'list'")
     public List<MenuOutputDTO> list(PageDTO param) {
         return super.list(param);
     }
 
     @Override
-    @LocalCache
     @Cacheable(key = "#p0")
     public MenuDO getById(String id) {
         return super.getById(id);
@@ -65,7 +60,6 @@ public class MenuServiceImpl extends AbstractService<MenuDO, MenuOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),
@@ -73,7 +67,6 @@ public class MenuServiceImpl extends AbstractService<MenuDO, MenuOutputDTO, Page
     protected void afterAdd(MenuDO model) { }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),
@@ -94,7 +87,6 @@ public class MenuServiceImpl extends AbstractService<MenuDO, MenuOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),

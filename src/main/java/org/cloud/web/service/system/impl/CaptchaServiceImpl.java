@@ -1,6 +1,5 @@
 package org.cloud.web.service.system.impl;
 
-import org.cloud.cache.CacheTTL;
 import org.cloud.util.ImageCaptchaGenerator;
 import org.cloud.web.service.system.ICaptchaService;
 import org.springframework.aop.framework.AopContext;
@@ -32,7 +31,6 @@ public class CaptchaServiceImpl implements ICaptchaService {
     boolean enable;
 
 
-    @CacheTTL(120L)
     @CachePut(key = "#token", unless = "#result == null")
     public String generateCaptchaImage(String token, OutputStream os) throws IOException {
         String captchaText = ImageCaptchaGenerator.generateCaptchaText(candidateString, 4);
@@ -55,7 +53,6 @@ public class CaptchaServiceImpl implements ICaptchaService {
         return null;
     }
 
-    @CacheTTL(120L)
     @CacheEvict(key = "#token")
     public void removeCaptchaCodeCache(String token) { }
 

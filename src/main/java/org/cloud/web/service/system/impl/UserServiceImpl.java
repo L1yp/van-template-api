@@ -8,7 +8,6 @@ import io.mybatis.mapper.fn.Fn;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.cloud.cache.CacheTTL;
 import org.cloud.config.TFAConfig;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.Converter;
@@ -82,7 +81,6 @@ import java.util.Set;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "user")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, UserQueryPageDTO> implements IUserService, StpInterface {
 
     @Resource
@@ -354,14 +352,12 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     @Resource
     MailService mailService;
 
-    @CacheTTL(60 * 60L)
     @CachePut(cacheNames = "captcha", key = "#token")
     public MailVerifyCodeDO cacheMailCodeModel(String token, MailVerifyCodeDO cacheModel) {
         return cacheModel;
     }
 
 
-    @CacheTTL(60 * 60L)
     @CachePut(cacheNames = "captcha", key = "#result", unless = "#result == null")
     public String getMailVerifyCode(MailVerifyCodeGetDTO param) {
         UserDO user = getProxy().getById(param.getLoginUserId());
@@ -386,7 +382,6 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     }
 
 
-    @CacheTTL(60 * 60L)
     @CacheEvict(cacheNames = "captcha", key = "#param.mailToken")
     public void bindMail(UserMailBindDTO param) {
         UserDO user = getProxy().getById(param.getLoginUserId());
@@ -416,7 +411,6 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     }
 
-    @CacheTTL(60 * 60L)
     @Cacheable(cacheNames = "captcha", key = "#token", unless = "#result == null")
     public MailVerifyCodeDO getMailVerifyCodeInCache(String token) {
         return null;

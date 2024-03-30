@@ -1,8 +1,6 @@
 package org.cloud.web.service.system.impl;
 
 import jakarta.annotation.Resource;
-import org.cloud.cache.CacheTTL;
-import org.cloud.cache.LocalCache;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
@@ -37,7 +35,6 @@ import java.util.List;
 
 @Service
 @CacheConfig(cacheNames = "role")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class RoleServiceImpl extends AbstractService<RoleDO, RoleOutputDTO, PageDTO> implements IRoleService {
 
     @Resource
@@ -56,14 +53,12 @@ public class RoleServiceImpl extends AbstractService<RoleDO, RoleOutputDTO, Page
     RoleMenuMapper roleMenuMapper;
 
     @Override
-    @LocalCache
     @Cacheable(key = "#p0", unless = "#result == null")
     public RoleDO getById(String id) {
         return super.getById(id);
     }
 
     @Override
-    @LocalCache
     @Cacheable(key = "'list'", unless = "#result == null")
     public List<RoleOutputDTO> list(PageDTO param) {
         return super.list(param);
@@ -78,7 +73,6 @@ public class RoleServiceImpl extends AbstractService<RoleDO, RoleOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),
@@ -95,7 +89,6 @@ public class RoleServiceImpl extends AbstractService<RoleDO, RoleOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),
@@ -103,7 +96,6 @@ public class RoleServiceImpl extends AbstractService<RoleDO, RoleOutputDTO, Page
     protected void afterAdd(RoleDO model) { }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'list'"),

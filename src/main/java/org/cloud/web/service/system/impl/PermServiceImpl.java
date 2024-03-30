@@ -1,8 +1,6 @@
 package org.cloud.web.service.system.impl;
 
 import jakarta.annotation.Resource;
-import org.cloud.cache.CacheTTL;
-import org.cloud.cache.LocalCache;
 import org.cloud.exception.BusinessException;
 import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
@@ -27,14 +25,12 @@ import java.util.List;
 
 @Service
 @CacheConfig(cacheNames = "perm")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class PermServiceImpl extends AbstractService<PermDO, PermOutputDTO, PageDTO> implements IPermService {
 
     @Resource
     IRolePermService rolePermService;
 
     @Override
-    @LocalCache
     @Cacheable(key = "#p0")
     public PermDO getById(String id) {
         return super.getById(id);
@@ -42,13 +38,11 @@ public class PermServiceImpl extends AbstractService<PermDO, PermOutputDTO, Page
 
 
     @Override
-    @LocalCache
     @Cacheable(key = "'list'")
     public List<PermOutputDTO> list(PageDTO param) {
         return super.list(param);
     }
 
-    @LocalCache
     @Cacheable(key = "'key:' + #p0")
     public PermDO getPermByKey(String key) {
         return baseMapper.wrapper().eq(PermDO::getPermKey, key).first().orElse(null);
@@ -89,7 +83,6 @@ public class PermServiceImpl extends AbstractService<PermDO, PermOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'key:' + #p0.permKey"),
@@ -101,7 +94,6 @@ public class PermServiceImpl extends AbstractService<PermDO, PermOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'key:' + #p0.permKey"),
@@ -111,7 +103,6 @@ public class PermServiceImpl extends AbstractService<PermDO, PermOutputDTO, Page
     }
 
     @Override
-    @LocalCache
     @Caching(evict = {
             @CacheEvict(key = "#p0.id"),
             @CacheEvict(key = "'key:' + #p0.permKey"),

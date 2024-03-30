@@ -1,7 +1,5 @@
 package org.cloud.web.service.system.impl;
 
-import org.cloud.cache.CacheTTL;
-import org.cloud.cache.LocalCache;
 import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
 import org.cloud.web.model.DO.system.RoleMenuDO;
@@ -16,27 +14,22 @@ import java.util.List;
 
 @Service
 @CacheConfig(cacheNames = "role_menu")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class RoleMenuServiceImpl extends AbstractService<RoleMenuDO, RoleMenuDTO, PageDTO> implements IRoleMenuService {
 
 
-    @LocalCache
     @Cacheable(key = "'role:' + #p0", unless = "#result == null")
     public List<String> listMenuIdByRoleId(String roleId) {
         return baseMapper.wrapper().eq(RoleMenuDO::getRoleId, roleId).list().stream().map(RoleMenuDO::getMenuId).distinct().toList();
     }
 
-    @LocalCache
     @Cacheable(key = "'menu:' + #p0", unless = "#result == null")
     public List<String> listRoleIdByMenuId(String menuId) {
         return baseMapper.wrapper().eq(RoleMenuDO::getMenuId, menuId).list().stream().map(RoleMenuDO::getRoleId).distinct().toList();
     }
 
-    @LocalCache
     @CacheEvict(key = "'menu:' + #p0")
     public void evictRoleIdListByMenuId(String menuId) { }
 
-    @LocalCache
     @CacheEvict(key = "'role:' + #p0")
     public void deleteMenuIdListByRoleId(String roleId) {
         baseMapper.wrapper().eq(RoleMenuDO::getRoleId, roleId).delete();

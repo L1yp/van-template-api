@@ -1,7 +1,5 @@
 package org.cloud.web.service.system.impl;
 
-import org.cloud.cache.CacheTTL;
-import org.cloud.cache.LocalCache;
 import org.cloud.model.common.PageDTO;
 import org.cloud.service.AbstractService;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
@@ -16,12 +14,10 @@ import java.util.List;
 
 @Service
 @CacheConfig(cacheNames = "user_dept")
-@CacheTTL(7 * 24 * 60 * 60L)
 public class UserDepartmentServiceImpl extends AbstractService<UserDepartmentDO, UserDepartmentOutputDTO, PageDTO> implements IUserDepartmentService {
 
 
 
-    @LocalCache
     @Cacheable(key = "'user:' + #p0")
     public List<String> listDepartmentIdByUserId(String userId) {
         return baseMapper.wrapper()
@@ -34,19 +30,16 @@ public class UserDepartmentServiceImpl extends AbstractService<UserDepartmentDO,
                 .toList();
     }
 
-    @LocalCache
     @Cacheable(key = "'dept:' + #p0")
     public List<String> listUserIdByDepartmentId(String departmentId) {
         return baseMapper.wrapper().eq(UserDepartmentDO::getDepartmentId, departmentId).list().stream().map(UserDepartmentDO::getUserId).distinct().toList();
     }
 
-    @LocalCache
     @CacheEvict(key = "'user:' + #p0")
     public void deleteDepartmentIdListByUserId(String userId) {
         baseMapper.wrapper().eq(UserDepartmentDO::getUserId, userId).delete();
     }
 
-    @LocalCache
     @CacheEvict(key = "'dept:' + #p0")
     public void evictUserIdListByDepartmentId(String departmentId) { }
 
