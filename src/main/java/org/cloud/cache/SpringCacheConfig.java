@@ -5,9 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+
+import java.time.Duration;
 
 @Configuration
 @EnableCaching(proxyTargetClass = true)
@@ -21,9 +22,11 @@ public class SpringCacheConfig {
 //                .computePrefixWith(key -> key + ":")
                 // set ttl
                 .entryTtl((k, v) -> {
-                    if (k instanceof String key && StringUtils.isNotBlank(key)) {
-                        String namespace = StringUtils.substringBefore(key, CacheKeyPrefix.SEPARATOR);
-                        return RedisKeyConstants.prefixDurationMap.get(namespace);
+                    if (k instanceof String key && StringUtils.isNotBlank(key) && key.contains("#")) {
+                        String ttl = StringUtils.substringAfterLast(key, "#");
+                        try {
+                            return Duration.parse(ttl);
+                        } catch (Exception ignored) { }
                     }
                     return null;
                 });
