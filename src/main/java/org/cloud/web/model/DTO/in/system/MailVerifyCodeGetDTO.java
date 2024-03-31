@@ -13,6 +13,14 @@ public class MailVerifyCodeGetDTO {
     @Schema(description = "电子邮箱地址")
     private String mail;
 
+    @NotBlank
+    @Schema(description = "验证码Token")
+    private String captchaToken;
+
+    @NotBlank
+    @Schema(description = "图形验证码")
+    private String captchaCode;
+
     @JsonIgnore
     @Schema(hidden = true)
     private String loginUserId;

@@ -10,8 +10,8 @@ import lombok.Data;
 public class UserMailBindDTO {
 
     @NotBlank
-    @Schema(description = "发送邮箱验证码返回的token")
-    private String mailToken;
+    @Schema(description = "邮件地址")
+    private String mail;
 
     @NotBlank
     @Schema(description = "邮件验证码")
