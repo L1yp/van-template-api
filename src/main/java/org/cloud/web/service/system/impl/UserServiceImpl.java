@@ -455,6 +455,11 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
             throw new BusinessException(400, "邮件验证码错误");
         }
 
+        UserDO emailUserDO = getProxy().getByEmail(param.getEmail());
+        if (emailUserDO != null) {
+            throw new BusinessException(400, "邮件地址已存在, 请输入新的邮箱地址");
+        }
+
         long count = getBaseMapper().wrapper().eq(UserDO::getUsername, param.getUsername()).count();
         if (count > 0) {
             throw new BusinessException(400, MessageUtils.getMessage("register.duplicate.username"));
