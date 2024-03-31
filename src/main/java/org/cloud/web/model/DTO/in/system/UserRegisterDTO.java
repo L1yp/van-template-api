@@ -3,7 +3,6 @@ package org.cloud.web.model.DTO.in.system;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,18 +27,15 @@ public class UserRegisterDTO implements Converter<UserDO> {
     @Schema(description = "昵称", example = "韩信")
     private String nickname;
 
-    @Schema(description = "推荐人Id")
-    private String parentId;
-
     @JsonIgnore
     @Schema(description = "注册IP", example = "127.0.0.1", hidden = true)
     private String registerIp;
 
-    @NotNull
-    @Schema(description = "验证码Token")
-    private String captchaToken;
 
-    @Schema(description = "验证码")
-    private String captchaCode;
+    @Schema(description = "邮箱地址")
+    private String email;
+
+    @Schema(description = "邮件验证码")
+    private String code;
 
 }

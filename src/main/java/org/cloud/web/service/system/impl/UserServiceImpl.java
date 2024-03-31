@@ -23,14 +23,12 @@ import org.cloud.util.ImageCaptchaGenerator;
 import org.cloud.util.MessageUtils;
 import org.cloud.util.PinyinUtil;
 import org.cloud.util.SpringContext;
-import org.cloud.util.TokenUtil;
 import org.cloud.web.context.LoginUtils;
 import org.cloud.web.model.DO.system.UserDO;
 import org.cloud.web.model.DO.system.UserDepartmentDO;
 import org.cloud.web.model.DO.system.UserLoginLogDO;
 import org.cloud.web.model.DO.system.UserRoleDO;
 import org.cloud.web.model.DO.system.UserTwoFAKeyDO;
-import org.cloud.web.model.DO.system.cache.MailVerifyCodeDO;
 import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
@@ -46,6 +44,7 @@ import org.cloud.web.model.DTO.out.system.UserLoginResultDTO;
 import org.cloud.web.model.DTO.out.system.UserLoginResultDTO.AuthBindInfo;
 import org.cloud.web.model.DTO.out.system.UserOutputDTO;
 import org.cloud.web.service.system.ICaptchaService;
+import org.cloud.web.service.system.IMailService;
 import org.cloud.web.service.system.IMenuService;
 import org.cloud.web.service.system.IRoleMenuService;
 import org.cloud.web.service.system.IRolePermService;
@@ -54,11 +53,10 @@ import org.cloud.web.service.system.IUserExtService;
 import org.cloud.web.service.system.IUserLoginLogService;
 import org.cloud.web.service.system.IUserRoleService;
 import org.cloud.web.service.system.IUserService;
-import org.cloud.web.service.system.MailService;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -103,6 +101,9 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
     @Resource
     UserTwoFAKeyServiceImpl userTwoFAKeyService;
+
+    @Value("${role.default:2}")
+    String defaultRoleId;
 
     public UserServiceImpl getProxy() {
         return SpringContext.getBean(UserServiceImpl.class);
@@ -257,7 +258,6 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         }
 
 
-
         StpUtil.login(user.getId());
         LoginUtils.setLoginUserId(user.getId());
 
@@ -350,16 +350,12 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     }
 
     @Resource
-    MailService mailService;
+    IMailService mailService;
 
-    @CachePut(cacheNames = "captcha", key = "#token")
-    public MailVerifyCodeDO cacheMailCodeModel(String token, MailVerifyCodeDO cacheModel) {
-        return cacheModel;
-    }
+    String MAIL_TYPE_BIND_EMAIL = "bind-mail";
 
-
-    @CachePut(cacheNames = "captcha", key = "#result", unless = "#result == null")
-    public String getMailVerifyCode(MailVerifyCodeGetDTO param) {
+    @Override
+    public void sendBindMailVerifyCode(MailVerifyCodeGetDTO param) {
         UserDO user = getProxy().getById(param.getLoginUserId());
         if (user == null) {
             throw new BusinessException(400, MessageUtils.getMessage("user.no-login"));
@@ -367,56 +363,42 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
 
         String mailCode = ImageCaptchaGenerator.generateCaptchaText("1234567890", 6);
 
-        String token = TokenUtil.genToken();
+        String cacheParam = param.getLoginUserId() + param.getMail();
 
-        MailVerifyCodeDO cacheModel = new MailVerifyCodeDO();
-        cacheModel.setOwnerUserId(user.getId());
-        cacheModel.setMail(param.getMail());
-        cacheModel.setVerifyCode(mailCode);
+        // 验证图形验证码并缓存邮件验证码
+        mailService.setVerifyCode(MAIL_TYPE_BIND_EMAIL, cacheParam, mailCode, param.getCaptchaToken(), param.getCaptchaCode());
 
-        getProxy().cacheMailCodeModel(token, cacheModel);
-
-
+        // 发送邮件
         mailService.sendVerifyCode(tfaConfig.getIssuer() + "邮箱绑定验证", param.getMail(), mailCode);
-        return token;
     }
 
 
-    @CacheEvict(cacheNames = "captcha", key = "#param.mailToken")
     public void bindMail(UserMailBindDTO param) {
         UserDO user = getProxy().getById(param.getLoginUserId());
         if (user == null) {
             throw new BusinessException(400, MessageUtils.getMessage("user.no-login"));
         }
 
-        MailVerifyCodeDO cacheModel = getProxy().getMailVerifyCodeInCache(param.getMailToken());
-
-        if (!user.getId().equals(cacheModel.getOwnerUserId())) {
-            throw new BusinessException(500, MessageUtils.getMessage("mail.bind.user.mismatch"));
-        }
-
-        if (!param.getCode().equals(cacheModel.getVerifyCode())) {
+        String cacheParam = param.getLoginUserId() + param.getMail();
+        String verifyCode = mailService.getVerifyCode(MAIL_TYPE_BIND_EMAIL, cacheParam);
+        if (!StringUtils.equalsAnyIgnoreCase(verifyCode, param.getCode())) {
             throw new BusinessException(400, MessageUtils.getMessage("mail.verify.error"));
         }
 
         baseMapper.wrapper()
-                .set(UserDO::getEmail, cacheModel.getMail())
+                .set(UserDO::getEmail, param.getMail())
                 .set(UserDO::getUpdateTime, LocalDateTime.now())
-                .eq(UserDO::getId, cacheModel.getOwnerUserId())
+                .eq(UserDO::getId, param.getLoginUserId())
                 .update();
 
         user = getProxy().getById(param.getLoginUserId());
 
         getProxy().afterUpdate(user, user);
 
+        // 移除缓存
+        mailService.removeVerifyCodeInCache(MAIL_TYPE_BIND_EMAIL, cacheParam);
+
     }
-
-    @Cacheable(cacheNames = "captcha", key = "#token", unless = "#result == null")
-    public MailVerifyCodeDO getMailVerifyCodeInCache(String token) {
-        return null;
-    }
-
-
 
     @Override
     @Transactional
@@ -467,9 +449,10 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     protected void afterAdd(UserDO model) { }
 
     @Transactional
-    public void register(UserRegisterDTO param) {
-        if (!captchaService.verifyCaptchaCode(param.getCaptchaToken(), param.getCaptchaCode())) {
-            throw new BusinessException(400, MessageUtils.getMessage("captcha.verify.error"));
+    public UserLoginResultDTO register(UserRegisterDTO param) {
+        String verifyCode = mailService.getVerifyCode(MAIL_TYPE_USER_REGISTER, param.getEmail());
+        if (!StringUtils.equalsAnyIgnoreCase(verifyCode, param.getCode())) {
+            throw new BusinessException(400, "邮件验证码错误");
         }
 
         long count = getBaseMapper().wrapper().eq(UserDO::getUsername, param.getUsername()).count();
@@ -483,15 +466,30 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         IUserService userService = (IUserService) AopContext.currentProxy();
         userService.insert(userDO);
 
-        if (StringUtils.isNotBlank(param.getCaptchaToken())) {
-            captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
-        }
-
 
         UserDO model = getProxy().getById(userDO.getId());
         getProxy().afterAdd(model);
 
-        // 删除验证码缓存
+        LoginUtils.setLoginUserId(userDO.getId());
+
+        UserRoleBindDTO bindDTO = new UserRoleBindDTO();
+        bindDTO.setUserId(userDO.getId());
+        bindDTO.setRoleIdList(List.of(defaultRoleId));
+        getProxy().bindRole(bindDTO);
+
+        StpUtil.login(userDO.getId());
+
+        var userLoginLog = new UserLoginLogDO();
+        userLoginLog.setLoginIp(param.getRegisterIp());
+        userLoginLog.setToken(StpUtil.getTokenValue());
+        userLoginLog.setUsername(param.getUsername());
+        userLoginLog.setNickname(param.getNickname());
+        userLoginLog.setLoginType(LoginType.PWD);
+        userLoginLogService.insert(userLoginLog);
+
+
+        return getLoginResult(userDO.getId());
+
     }
 
     public List<MenuOutputDTO> getMenuList(String userId) {
@@ -688,5 +686,20 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         }
 
         userDepartmentService.deleteDepartmentIdListByUserId(model.getId());
+    }
+
+    String MAIL_TYPE_USER_REGISTER = "user-register";
+
+    @Override
+    public void sendRegisterMailCode(MailVerifyCodeGetDTO param) {
+        String mailCode = ImageCaptchaGenerator.generateCaptchaText("1234567890", 6);
+
+        String cacheParam = param.getMail();
+
+        // 验证图形验证码并缓存邮件验证码并删除图片验证码缓存
+        mailService.setVerifyCode(MAIL_TYPE_USER_REGISTER, cacheParam, mailCode, param.getCaptchaToken(), param.getCaptchaCode());
+
+        // 发送邮件
+        mailService.sendVerifyCode(tfaConfig.getIssuer() + "邮箱绑定验证", param.getMail(), mailCode);
     }
 }

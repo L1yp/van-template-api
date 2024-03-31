@@ -27,6 +27,7 @@ import org.cloud.web.model.DTO.in.system.UserUpdateDTO;
 import org.cloud.web.model.DTO.out.system.UserLoginResultDTO;
 import org.cloud.web.model.DTO.out.system.UserOutputDTO;
 import org.cloud.web.service.system.IUserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,7 +55,8 @@ public class UserController {
     @Resource
     IUserService service;
 
-    String defaultRole = "2";
+    @Value("${role.default:2}")
+    String defaultRole;
 
     HttpServletRequest getRequest() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -69,7 +71,8 @@ public class UserController {
         if (request == null) {
             return null;
         }
-        return request.getRemoteAddr();
+        String realIp = request.getHeader("X-Real-IP");
+        return realIp == null ? request.getRemoteAddr() : realIp;
     }
 
     @Operation(summary = "获取登录状态信息")
@@ -112,17 +115,27 @@ public class UserController {
         return ResultData.OK;
     }
 
+    @SaIgnore
+    @Operation(summary = "获取注册邮件验证码")
+    @PostMapping("/register/sendMailCode")
+    public ResultData<Void> sendRegisterMailCode(@Validated @RequestBody MailVerifyCodeGetDTO param) {
+        if (StpUtil.isLogin()) {
+            return ResultData.err(400, "禁止以登录状态下注册帐号, 请先退出登录");
+        }
+        service.sendRegisterMailCode(param);
+        return ResultData.OK;
+    }
+
     // 客户端接口
     @SaIgnore
     @Operation(summary = "用户注册")
     @PostMapping("/register")
-    public ResultData<Void> register(@Validated @RequestBody UserRegisterDTO param) {
+    public ResultData<UserLoginResultDTO> register(@Validated @RequestBody UserRegisterDTO param) {
         if (StpUtil.isLogin()) {
-            return ResultData.err(400, "禁止以登录状态下注册帐号, 请先退出登录");
+            LoginUtils.setLoginUserId(null);
         }
         param.setRegisterIp(getRequestIp());
-        service.register(param);
-        return ResultData.OK;
+        return ResultData.ok(service.register(param));
     }
 
 
@@ -207,9 +220,10 @@ public class UserController {
     @SaCheckLogin
     @Operation(summary = "获取邮箱验证码", description = "绑定邮箱前获取邮箱验证码及会话Token")
     @GetMapping("/mail/bind/getVerifyCode")
-    public ResultData<String> getMailVerifyCode(@Validated MailVerifyCodeGetDTO param) {
+    public ResultData<Void> getMailVerifyCode(@Validated MailVerifyCodeGetDTO param) {
         param.setLoginUserId(LoginUtils.getLoginUserId());
-        return ResultData.ok(service.getMailVerifyCode(param));
+        service.sendBindMailVerifyCode(param);
+        return ResultData.OK;
     }
 
     @SaCheckLogin

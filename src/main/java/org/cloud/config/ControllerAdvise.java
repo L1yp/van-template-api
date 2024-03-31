@@ -1,5 +1,7 @@
 package org.cloud.config;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.cloud.exception.BusinessException;
@@ -125,6 +127,17 @@ public class ControllerAdvise {
         log.error("handlerIOException", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResultData.err(HttpStatus.INTERNAL_SERVER_ERROR.value(), "链接超时，请稍后重试，或联系管理员！", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
     }
+
+    @ExceptionHandler(NotLoginException.class)
+    public ResponseEntity<ResultData<Void>> handlerException(NotLoginException e){
+        return ResponseEntity.ok(ResultData.err(HttpStatus.UNAUTHORIZED.value(), "请求有误，请稍后重试，或联系管理员！", 500, e.getMessage()));
+    }
+
+    @ExceptionHandler(NotPermissionException.class)
+    public ResponseEntity<ResultData<Void>> handlerException(NotPermissionException e){
+        return ResponseEntity.ok(ResultData.err(HttpStatus.BAD_REQUEST.value(), "请求有误，请稍后重试，或联系管理员！", 500, e.getMessage()));
+    }
+
 
 
     @ExceptionHandler(Exception.class)

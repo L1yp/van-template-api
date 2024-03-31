@@ -77,7 +77,7 @@ public interface IUserService {
      * 用户注册
      * @param param
      */
-    void register(UserRegisterDTO param);
+    UserLoginResultDTO register(UserRegisterDTO param);
 
     /**
      * 获取用户绑定的菜单列表
@@ -133,7 +133,19 @@ public interface IUserService {
 
     void update(UserUpdateDTO param);
 
-    String getMailVerifyCode(MailVerifyCodeGetDTO param);
 
+    /**
+     * 获取绑定邮箱的验证码
+     * @param param 验证码参数
+     * @return
+     */
+    void sendBindMailVerifyCode(MailVerifyCodeGetDTO param);
+
+    /**
+     * 提交绑定请求
+     * @param param 绑定参数
+     */
     void bindMail(UserMailBindDTO param);
+
+    void sendRegisterMailCode(MailVerifyCodeGetDTO param);
 }
