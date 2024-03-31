@@ -51,12 +51,13 @@ sa-token:
   is-log: true
   # 设置了永不过期就无需续签(续签会[查询]校验)
   auto-renew: false
+  is-read-cookie: false
 
 
 captcha:
   candidate: "abcdefghjkmnpqrstuvwxyz23456789"
-  width: 200
-  height: 100
+  width: 100
+  height: 50
   # 是否启用验证码功能
   enable: true
 
