@@ -15,6 +15,9 @@ public class UserQueryPageDTO extends PageDTO {
     @Schema(description = "关键词")
     private String keyword;
 
+    @Schema(description = "关键父账号Id")
+    private String parentId;
+
     @BasicEnumValid(CommonStatus.class)
     @Schema(description = "状态")
     private Integer status;

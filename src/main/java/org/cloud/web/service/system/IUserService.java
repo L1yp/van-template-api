@@ -2,7 +2,10 @@ package org.cloud.web.service.system;
 
 import org.cloud.model.common.PageData;
 import org.cloud.mybatis.Mapper;
+import org.cloud.model.enums.CommonStatus;
 import org.cloud.web.model.DO.system.UserDO;
+import org.cloud.web.model.DTO.in.business.UserSubAccountAddDTO;
+import org.cloud.web.model.DTO.in.business.UserSubAccountDisabledDTO;
 import org.cloud.web.model.DTO.in.system.MailVerifyCodeGetDTO;
 import org.cloud.web.model.DTO.in.system.UserAddDTO;
 import org.cloud.web.model.DTO.in.system.UserChangePwdDTO;
@@ -147,5 +150,9 @@ public interface IUserService {
      */
     void bindMail(UserMailBindDTO param);
 
+
+    /**
+     * 发送注册邮件验证码
+     */
     void sendRegisterMailCode(MailVerifyCodeGetDTO param);
 }

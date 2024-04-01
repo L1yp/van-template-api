@@ -121,6 +121,9 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
                     it -> it.contains(PinyinUtil.isPureLetter(keyword), UserDO::getNicknamePinyin, String.join("%", keyword.toLowerCase(Locale.ROOT).split("")))
             );
         }
+        if (StringUtils.isNotBlank(pageDTO.getParentId())) {
+            wrapper.eq(UserDO::getParentId, pageDTO.getParentId());
+        }
     }
 
     @Override
@@ -494,7 +497,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         userLoginLog.setToken(StpUtil.getTokenValue());
         userLoginLog.setUsername(param.getUsername());
         userLoginLog.setNickname(param.getNickname());
-        userLoginLog.setLoginType(LoginType.PWD);
+        userLoginLog.setLoginType(LoginType.REGISTER);
         userLoginLogService.insert(userLoginLog);
 
 
@@ -712,4 +715,5 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         // 发送邮件
         mailService.sendVerifyCode(tfaConfig.getIssuer() + "邮箱绑定验证", param.getMail(), mailCode);
     }
+
 }
