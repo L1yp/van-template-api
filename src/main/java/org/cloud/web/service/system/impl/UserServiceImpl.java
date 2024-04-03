@@ -305,45 +305,24 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     }
 
     public void changePwd(UserChangePwdDTO param) {
-        if (!captchaService.verifyCaptchaCode(param.getCaptchaToken(), param.getCaptchaCode())) {
-            throw new BusinessException(400, MessageUtils.getMessage("captcha.verify.error"));
+        UserDO user = getProxy().getById(param.getLoginUserId());
+        if (user == null || user.getStatus() == CommonStatus.DISABLE) {
+            throw new BusinessException(500, "帐号异常");
         }
 
-        UserDO user = getProxy().getByUserName(param.getUsername());
-        if (user == null) {
-            throw new BusinessException(400, MessageUtils.getMessage("user.not-found", param.getUsername()));
-        }
-
-        if (tfaConfig.isEnable()) {
-            if (StringUtils.isBlank(param.getAuthCode())) {
-                throw new BusinessException(400, MessageUtils.getMessage("authenticator.code.blank"));
-            }
-
-            UserTwoFAKeyDO userTwoFAKeyDO = userTwoFAKeyService.getById(user.getId());
-            if (userTwoFAKeyDO == null) {
-                throw new BusinessException(400, MessageUtils.getMessage("authenticator.miss.secretKey"));
-            }
-
-            if (!AuthenticatorUtils.verifyCode(userTwoFAKeyDO.getSecretKey(), param.getAuthCode())) {
-                throw new BusinessException(400, MessageUtils.getMessage("authenticator.verify.error"));
-            }
-
+        Instant instant = user.getCreateTime().toInstant(ZoneOffset.UTC);
+        if (!StringUtils.equalsIgnoreCase(DigestUtil.md5(param.getOldPassword(), String.valueOf(instant.toEpochMilli())), user.getPassword())) {
+            throw new BusinessException(400, "密码错误");
         }
 
         UserDO updateDO = new UserDO();
         updateDO.setId(user.getId());
 
         String md5Pass = param.getNewPassword();
-        Instant instant = user.getCreateTime().toInstant(ZoneOffset.UTC);
         String password = DigestUtil.md5(md5Pass.toLowerCase(), String.valueOf(instant.toEpochMilli()));
 
         updateDO.setPassword(password);
         baseMapper.updateByPrimaryKeySelective(updateDO);
-
-        if (StringUtils.isNotBlank(param.getCaptchaToken())) {
-            // 删除验证码缓存
-            captchaService.removeCaptchaCodeCache(param.getCaptchaToken());
-        }
 
         // 退出本帐号的所有登录会话
         StpUtil.logout(user.getId());

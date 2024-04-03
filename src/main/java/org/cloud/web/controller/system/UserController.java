@@ -148,10 +148,10 @@ public class UserController {
         return ResultData.ok(resultDTO);
     }
 
-    @SaCheckPermission("user.password.change")
     @Operation(summary = "用户修改密码")
     @PostMapping("/changePwd")
     public ResultData<Void> changePwd(@Validated @RequestBody UserChangePwdDTO param) {
+        param.setLoginUserId(LoginUtils.getLoginUserId());
         service.changePwd(param);
         return ResultData.OK;
     }
