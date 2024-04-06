@@ -18,7 +18,7 @@ public class SpringCacheConfig {
     public RedisCacheConfiguration redisCacheConfiguration(JavaTimeModule javaTimeModule){
         JacksonRedisSerializer<?> serializer = new JacksonRedisSerializer<>(javaTimeModule);
         return RedisCacheConfiguration.defaultCacheConfig()
-                .disableCachingNullValues()
+//                .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
 //                .computePrefixWith(key -> key + ":")
                 // set ttl

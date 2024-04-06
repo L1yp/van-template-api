@@ -428,6 +428,11 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(key = "#p0.id"),
+            @CacheEvict(key = "'userName:' + #p0.username"),
+            @CacheEvict(key = "'email:' + #p0.email", condition = "#p0.email != null"),
+    })
     protected void afterAdd(UserDO model) { }
 
     @Transactional
