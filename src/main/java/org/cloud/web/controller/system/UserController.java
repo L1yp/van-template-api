@@ -234,4 +234,22 @@ public class UserController {
         service.bindMail(param);
         return ResultData.OK;
     }
+
+    @SaCheckPermission("user.switch")
+    @Operation(summary = "模拟登录用户")
+    @PutMapping("/switch/{userId}")
+    public ResultData<Void> switchTo(@PathVariable("userId") String userId) {
+        StpUtil.switchTo(userId);
+        return ResultData.OK;
+    }
+
+
+    @SaCheckPermission("user.switch")
+    @Operation(summary = "结束模拟登录")
+    @PutMapping("/switch/end")
+    public ResultData<Void> endSwitch() {
+        StpUtil.endSwitch();
+        return ResultData.OK;
+    }
+
 }

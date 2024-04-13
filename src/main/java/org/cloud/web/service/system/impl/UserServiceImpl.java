@@ -293,6 +293,7 @@ public class UserServiceImpl extends AbstractService<UserDO, UserOutputDTO, User
         result.setMenuList(userService.getMenuList(userId));
         result.setRoleIdList(userService.getRoleIdList(userId));
         result.setPermKeyList(userService.getPermKeyList(userId));
+        result.setIsSwitch(StpUtil.isSwitch());
 
         IUserExtService userExtService = SpringContext.getBean(IUserExtService.class);
         if (userExtService != null) {

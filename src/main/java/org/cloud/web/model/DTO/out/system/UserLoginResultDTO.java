@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.cloud.model.enums.UserLoginResultStatus;
 import org.cloud.model.enums.base.BasicEnumValid;
@@ -46,5 +47,9 @@ public class UserLoginResultDTO {
         @Schema(description = "授权的URL")
         private String otpAuthURL;
     }
+
+    @NonNull
+    @Schema(description = "是否模拟登录")
+    private Boolean isSwitch;
 
 }
