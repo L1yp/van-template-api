@@ -239,7 +239,7 @@ public class UserController {
     @Operation(summary = "模拟登录用户")
     @PutMapping("/switch/{userId}")
     public ResultData<Void> switchTo(@PathVariable("userId") String userId) {
-        StpUtil.switchTo(userId);
+        StpUtil.getSession().set("switch", userId);
         return ResultData.OK;
     }
 
@@ -249,6 +249,7 @@ public class UserController {
     @PutMapping("/switch/end")
     public ResultData<Void> endSwitch() {
         StpUtil.endSwitch();
+        StpUtil.getSession().delete("switch");
         return ResultData.OK;
     }
 
